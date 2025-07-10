@@ -1,4 +1,4 @@
-package com.chirilglance.androidglancedna.examples.auth
+package com.chirilglance.androidglancedna.presentation.examples.location
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,10 +8,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun AuthenticationScreen() {
+fun LocationServiceScreen() {
     Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+    modifier = Modifier.fillMaxSize(),
+    contentAlignment = Alignment.Center
     ) {
         Text("UI Components Screen - Coming Soon")
     }

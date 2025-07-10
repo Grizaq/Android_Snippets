@@ -1,4 +1,4 @@
-package com.chirilglance.androidglancedna.examples.ui
+package com.chirilglance.androidglancedna.presentation.examples.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -72,7 +72,7 @@ fun UIComponentsScreen() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp)
+                .padding(24.dp)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
@@ -214,9 +214,8 @@ fun UIComponentsScreen() {
                     value = labeledCardText,
                     onValueChange = { labeledCardText = it },
                     label = "Username:",
-                    hint = "Enter username",
+                    hint = "Enter username...",
                     elevation = 2.dp,
-                    containerColor = Color(0xFFF8F8F8),
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -258,7 +257,7 @@ fun UIComponentsScreen() {
                         Icon(
                             imageVector = Icons.Default.Info,
                             contentDescription = "Info",
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.secondary
                         )
                     },
                     modifier = Modifier.fillMaxWidth()
@@ -272,7 +271,7 @@ fun UIComponentsScreen() {
                     title = "Clickable Card",
                     description = if (clickCount == 0) "Click me!" else "Clicked $clickCount times",
                     onClick = { clickCount++ },
-                    containerColor = Color(0xFFF5F5F5),
+                    containerColor = MaterialTheme.colorScheme.surface,
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -307,7 +306,7 @@ fun UIComponentsScreen() {
                             horizontalArrangement = Arrangement.End
                         ) {
                             TextButton(onClick = { /* Handle click */ }) {
-                                Text("Cancel")
+                                Text(text = "Cancel", color = MaterialTheme.colorScheme.secondary)
                             }
                             Spacer(modifier = Modifier.width(8.dp))
                             Button(onClick = { /* Handle click */ }) {
@@ -328,14 +327,14 @@ fun UIComponentsScreen() {
                         Icon(
                             imageVector = Icons.Default.Email,
                             contentDescription = "Email",
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.secondary
                         )
                     },
                     actions = {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                .padding(vertical = 8.dp)
                         ) {
                             PrimaryButton(
                                 text = "Primary Action",

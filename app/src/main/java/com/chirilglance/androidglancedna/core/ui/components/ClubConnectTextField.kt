@@ -21,9 +21,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.chirilglance.androidglancedna.ui.theme.ErrorRed
-import com.chirilglance.androidglancedna.ui.theme.HintColor
-import com.chirilglance.androidglancedna.ui.theme.Navy
+import com.chirilglance.androidglancedna.presentation.ui.theme.ErrorRed
+import com.chirilglance.androidglancedna.presentation.ui.theme.HintColor
+import com.chirilglance.androidglancedna.presentation.ui.theme.Navy
 
 /**
  * A reusable text field component with standard styling and validation.
@@ -69,7 +69,7 @@ fun ClubConnectTextField(
                 }
             },
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text(hint) },
+            placeholder = { Text(text = hint, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)) },
             isError = errorMessage != null,
             readOnly = readOnly,
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
@@ -181,7 +181,7 @@ fun LabeledTextField(
                 Text(
                     text = label,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = Navy,
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier
                         .weight(labelWeight)
                         .padding(end = 8.dp)
@@ -194,7 +194,7 @@ fun LabeledTextField(
                     placeholder = {
                         Text(
                             text = hint,
-                            color = HintColor
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                         )
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = keyboardType),

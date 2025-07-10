@@ -1,4 +1,4 @@
-package com.chirilglance.androidglancedna.home
+package com.chirilglance.androidglancedna.presentation.home
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.chirilglance.androidglancedna.navigation.NavigationRoutes
+import com.chirilglance.androidglancedna.presentation.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,7 +51,7 @@ fun HomeScreen(navController: NavController) {
                 ExampleItem(
                     title = example.title,
                     description = example.description,
-                    onClick = { navController.navigate(example.route) }
+                    onClick = { navController.navigate(example.route.route) }
                 )
             }
         }
@@ -87,15 +87,15 @@ private fun ExampleItem(
 }
 
 private fun getExampleItems() = listOf(
-    ExampleItem("UI Components", "Buttons, text fields, cards and other UI elements", NavigationRoutes.UI_COMPONENTS),
-    ExampleItem("Form Validation", "Input validation examples", NavigationRoutes.FORM_VALIDATION),
-    ExampleItem("Authentication", "OTP verification flow", NavigationRoutes.AUTHENTICATION),
-    ExampleItem("Location Services", "Places API integration", NavigationRoutes.LOCATION_SERVICES)
+    ExampleItem("UI Components", "Buttons, text fields, cards and other UI elements", Screen.UiComponents),
+    ExampleItem("Form Validation", "Input validation examples", Screen.FormValidation),
+    ExampleItem("Authentication", "OTP verification flow", Screen.Authentication),
+    ExampleItem("Location Services", "Places API integration", Screen.LocationServices)
     // Add more examples as you implement them
 )
 
 private data class ExampleItem(
     val title: String,
     val description: String,
-    val route: String
+    val route: Screen
 )

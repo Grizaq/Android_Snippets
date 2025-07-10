@@ -3,6 +3,7 @@ package com.chirilglance.androidglancedna.core.ui.components
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,7 +36,8 @@ fun ClubConnectCard(
     contentColor: Color = MaterialTheme.colorScheme.onSurface,
     onClick: (() -> Unit)? = null,
     imageContent: @Composable (() -> Unit)? = null,
-    icon: @Composable (() -> Unit)? = null
+    icon: @Composable (() -> Unit)? = null,
+    contentPadding: PaddingValues = PaddingValues(16.dp)
 ) {
     val cardModifier = if (onClick != null) {
         modifier.clickable(onClick = onClick)
@@ -54,7 +56,7 @@ fun ClubConnectCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(contentPadding)
         ) {
             // Header with icon if provided
             if (icon != null) {

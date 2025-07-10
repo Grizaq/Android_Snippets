@@ -1,4 +1,4 @@
-package com.chirilglance.androidglancedna.ui.theme
+package com.chirilglance.androidglancedna.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
