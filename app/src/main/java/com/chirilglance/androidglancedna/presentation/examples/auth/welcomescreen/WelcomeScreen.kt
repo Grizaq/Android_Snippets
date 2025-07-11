@@ -8,6 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.chirilglance.androidglancedna.core.ui.components.ClubConnectCard
+import com.chirilglance.androidglancedna.core.ui.components.ClubConnectCardDefaults
 
 @Composable
 fun WelcomeScreen(
@@ -24,9 +25,12 @@ fun WelcomeScreen(
         ) {
             ClubConnectCard(
                 modifier = Modifier.align(Alignment.Center),
-                title = "Verification Successful!",
-                subtitle = "Welcome to Android Glance DNA",
-                description = "Your phone number has been verified successfully. You can now access all features of the application."
+                titleContent = ClubConnectCardDefaults.Title("Verification Successful!"),
+                subtitleContent = ClubConnectCardDefaults.Subtitle("Welcome to Android Glance DNA"),
+                // Accessibility options
+                descriptionContent = ClubConnectCardDefaults.Description(
+                    "Your phone number has been verified successfully. You can now access all features of the application."
+                )
             )
 
             // Bottom action button

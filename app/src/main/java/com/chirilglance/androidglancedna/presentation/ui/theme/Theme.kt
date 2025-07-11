@@ -72,6 +72,8 @@ private val GlanceLightColorScheme = lightColorScheme(
     inversePrimary = ClubConnectGreen
 )
 
+// Note: the app is focusing on light color there at the moment, for proper handling, no colors should be used outside the MaterialTheme.colorScheme should be used (or tested in both dark and light mode after adding
+// Note2: Design should be consistent with theme handling, having a stable set of colors which remain unchanged for similar scenarios
 private val GlanceDarkColorScheme = darkColorScheme(
     // Primary colors
     primary = ClubConnectGreen,

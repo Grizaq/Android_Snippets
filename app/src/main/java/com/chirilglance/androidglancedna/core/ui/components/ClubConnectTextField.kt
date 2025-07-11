@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -18,6 +19,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -27,6 +30,24 @@ import com.chirilglance.androidglancedna.presentation.ui.theme.Navy
 
 /**
  * A reusable text field component with standard styling and validation.
+ *
+ * @param value Current text value to display
+ * @param onValueChange Callback when text changes
+ * @param label Text label displayed above the input field
+ * @param modifier Modifier to be applied to the component
+ * @param hint Placeholder text shown when the field is empty
+ * @param maxLength Maximum character length (defaults to unlimited)
+ * @param errorMessage Optional error message to display below the field
+ * @param isActive Whether the field should appear active/highlighted
+ * @param keyboardType Type of keyboard to display (text, number, email, etc.)
+ * @param imeAction Action button to show on the keyboard
+ * @param onDone Callback when the keyboard's action button is pressed
+ * @param trailingIcon Optional composable for trailing icon
+ * @param leadingIcon Optional composable for leading icon
+ * @param textColor Color for the input text
+ * @param allowSpaces Whether spaces should be accepted in the input
+ * @param readOnly Whether the field should be editable
+ * @param singleLine Whether to restrict input to a single line
  */
 @Composable
 fun ClubConnectTextField(
@@ -39,11 +60,17 @@ fun ClubConnectTextField(
     errorMessage: String? = null,
     isActive: Boolean = false,
     keyboardType: KeyboardType = KeyboardType.Text,
+    imeAction: ImeAction = ImeAction.Default,
+    onDone: (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
+    leadingIcon: @Composable (() -> Unit)? = null,
     textColor: Color = Navy,
     allowSpaces: Boolean = true,
-    readOnly: Boolean = false
+    readOnly: Boolean = false,
+    singleLine: Boolean = false
 ) {
+    val focusManager = LocalFocusManager.current
+
     Column(modifier = modifier.fillMaxWidth()) {
         // Label
         Text(
@@ -69,11 +96,27 @@ fun ClubConnectTextField(
                 }
             },
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text(text = hint, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)) },
+            placeholder = {
+                Text(
+                    text = hint,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                )
+            },
             isError = errorMessage != null,
             readOnly = readOnly,
-            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+            singleLine = singleLine,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = keyboardType,
+                imeAction = imeAction
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    focusManager.clearFocus()
+                    onDone?.invoke()
+                }
+            ),
             trailingIcon = trailingIcon,
+            leadingIcon = leadingIcon,
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                 unfocusedBorderColor = if (isActive) MaterialTheme.colorScheme.primary.copy(alpha = 0.8f) else MaterialTheme.colorScheme.outline,
@@ -101,7 +144,21 @@ fun ClubConnectTextField(
 }
 
 /**
- * A text field specifically for number input
+ * A text field specifically designed for numeric input with optional validation.
+ *
+ * @param value Current text value to display
+ * @param onValueChange Callback when text changes
+ * @param label Text label displayed above the input field
+ * @param modifier Modifier to be applied to the component
+ * @param hint Placeholder text shown when the field is empty
+ * @param errorMessage Optional error message to display below the field
+ * @param isInteger Whether to restrict input to whole numbers only
+ * @param minValue Optional minimum value constraint
+ * @param maxValue Optional maximum value constraint
+ * @param imeAction Action button to show on the keyboard
+ * @param onDone Callback when the keyboard's action button is pressed
+ * @param readOnly Whether the field should be editable
+ * @param singleLine Whether to restrict input to a single line
  */
 @Composable
 fun NumberTextField(
@@ -114,7 +171,10 @@ fun NumberTextField(
     isInteger: Boolean = true,
     minValue: Float? = null,
     maxValue: Float? = null,
-    readOnly: Boolean = false
+    imeAction: ImeAction = ImeAction.Done,
+    onDone: (() -> Unit)? = null,
+    readOnly: Boolean = false,
+    singleLine: Boolean = true
 ) {
     ClubConnectTextField(
         value = value,
@@ -142,14 +202,33 @@ fun NumberTextField(
         hint = hint,
         errorMessage = errorMessage,
         keyboardType = if (isInteger) KeyboardType.Number else KeyboardType.Decimal,
+        imeAction = imeAction,
+        onDone = onDone,
         allowSpaces = false,
         readOnly = readOnly,
+        singleLine = singleLine,
         modifier = modifier
     )
 }
 
 /**
- * A label and text field in a row layout, wrapped in a card
+ * A label and text field in a row layout, wrapped in a card for a compact form element.
+ *
+ * @param value Current text value to display
+ * @param onValueChange Callback when text changes
+ * @param label Text label displayed beside the input field
+ * @param modifier Modifier to be applied to the component
+ * @param hint Placeholder text shown when the field is empty
+ * @param errorMessage Optional error message to display below the card
+ * @param keyboardType Type of keyboard to display
+ * @param imeAction Action button to show on the keyboard
+ * @param onDone Callback when the keyboard's action button is pressed
+ * @param labelWeight Weight of the label in the row (0-1)
+ * @param fieldWeight Weight of the field in the row (0-1)
+ * @param containerColor Background color of the card
+ * @param elevation Shadow depth of the card
+ * @param contentPadding Padding inside the card
+ * @param singleLine Whether to restrict input to a single line
  */
 @Composable
 fun LabeledTextField(
@@ -160,12 +239,17 @@ fun LabeledTextField(
     hint: String = "",
     errorMessage: String? = null,
     keyboardType: KeyboardType = KeyboardType.Text,
+    imeAction: ImeAction = ImeAction.Done,
+    onDone: (() -> Unit)? = null,
     labelWeight: Float = 0.4f,
     fieldWeight: Float = 0.6f,
     containerColor: Color = MaterialTheme.colorScheme.surface,
     elevation: Dp = 0.dp,
-    contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 4.dp)
+    contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
+    singleLine: Boolean = true
 ) {
+    val focusManager = LocalFocusManager.current
+
     Column(modifier = modifier) {
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -197,8 +281,18 @@ fun LabeledTextField(
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                         )
                     },
-                    keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = keyboardType,
+                        imeAction = imeAction
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            focusManager.clearFocus()
+                            onDone?.invoke()
+                        }
+                    ),
                     isError = errorMessage != null,
+                    singleLine = singleLine,
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
@@ -209,8 +303,7 @@ fun LabeledTextField(
                         errorIndicatorColor = ErrorRed,
                         focusedPlaceholderColor = HintColor,
                         unfocusedPlaceholderColor = HintColor
-                    ),
-                    singleLine = true
+                    )
                 )
             }
         }
@@ -224,5 +317,36 @@ fun LabeledTextField(
                 modifier = Modifier.padding(top = 4.dp, start = 4.dp)
             )
         }
+    }
+}
+
+/**
+ * Helper object with defaults for text field components
+ */
+object ClubConnectTextFieldDefaults {
+    /**
+     * Creates a standard label for text fields
+     */
+    @Composable
+    fun Label(text: String) = @Composable {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyLarge,
+            color = Navy,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+    }
+
+    /**
+     * Creates a standard error message display
+     */
+    @Composable
+    fun ErrorMessage(text: String) = @Composable {
+        Text(
+            text = text,
+            color = ErrorRed,
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.padding(top = 4.dp, start = 4.dp)
+        )
     }
 }
