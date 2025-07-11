@@ -38,11 +38,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.chirilglance.androidglancedna.core.ui.components.ClubConnectCard
+import com.chirilglance.androidglancedna.core.ui.components.ClubConnectCardDefaults
 import com.chirilglance.androidglancedna.core.ui.components.ClubConnectTextField
 import com.chirilglance.androidglancedna.core.ui.components.LabeledTextField
 import com.chirilglance.androidglancedna.core.ui.components.NumberTextField
-import com.chirilglance.androidglancedna.core.ui.components.PrimaryButton
-import com.chirilglance.androidglancedna.core.ui.components.SecondaryButton
+import com.chirilglance.androidglancedna.core.ui.components.buttons.PrimaryButton
+import com.chirilglance.androidglancedna.core.ui.components.buttons.SecondaryButton
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -242,8 +243,8 @@ fun UIComponentsScreen() {
             ComponentSection(title = "Cards") {
                 // Basic Card
                 ClubConnectCard(
-                    title = "Card Title",
-                    description = "This is a basic card with title and description.",
+                    titleContent = ClubConnectCardDefaults.Title("Card Title"),
+                    descriptionContent = ClubConnectCardDefaults.Description("This is a basic card with title and description."),
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -251,9 +252,9 @@ fun UIComponentsScreen() {
 
                 // Card with Icon
                 ClubConnectCard(
-                    title = "Card with Icon",
-                    description = "This card includes an icon in the top left.",
-                    icon = {
+                    titleContent = ClubConnectCardDefaults.Title("Card with Icon"),
+                    descriptionContent = ClubConnectCardDefaults.Description("This card includes an icon in the top left."),
+                    leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Info,
                             contentDescription = "Info",
@@ -268,8 +269,14 @@ fun UIComponentsScreen() {
                 // Clickable Card
                 var clickCount by remember { mutableIntStateOf(0) }
                 ClubConnectCard(
-                    title = "Clickable Card",
-                    description = if (clickCount == 0) "Click me!" else "Clicked $clickCount times",
+                    titleContent = ClubConnectCardDefaults.Title("Clickable Card"),
+                    descriptionContent = {
+                        Text(
+                            text = if (clickCount == 0) "Click me!" else "Clicked $clickCount times",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                        )
+                    },
                     onClick = { clickCount++ },
                     containerColor = MaterialTheme.colorScheme.surface,
                     modifier = Modifier.fillMaxWidth()
@@ -279,8 +286,20 @@ fun UIComponentsScreen() {
 
                 // Colored Card
                 ClubConnectCard(
-                    title = "Colored Card",
-                    description = "This card has custom background and text colors.",
+                    titleContent = {
+                        Text(
+                            text = "Colored Card",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = Color(0xFF2E7D32) // Dark green
+                        )
+                    },
+                    descriptionContent = {
+                        Text(
+                            text = "This card has custom background and text colors.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color(0xFF2E7D32).copy(alpha = 0.7f) // Dark green with alpha
+                        )
+                    },
                     containerColor = Color(0xFFE8F5E9), // Light green
                     contentColor = Color(0xFF2E7D32), // Dark green
                     modifier = Modifier.fillMaxWidth()
@@ -290,10 +309,10 @@ fun UIComponentsScreen() {
 
                 // Card with Horizontally-arranged Action Buttons
                 ClubConnectCard(
-                    title = "Card with Actions",
-                    subtitle = "With Horizontal Buttons",
-                    description = "This card includes action buttons arranged horizontally.",
-                    icon = {
+                    titleContent = ClubConnectCardDefaults.Title("Card with Actions"),
+                    subtitleContent = ClubConnectCardDefaults.Subtitle("With Horizontal Buttons"),
+                    descriptionContent = ClubConnectCardDefaults.Description("This card includes action buttons arranged horizontally."),
+                    leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Favorite,
                             contentDescription = "Favorite",
@@ -321,9 +340,9 @@ fun UIComponentsScreen() {
 
                 // Card with Vertically Stacked Buttons
                 ClubConnectCard(
-                    title = "Card with Stacked Buttons",
-                    description = "This card has buttons stacked vertically with padding.",
-                    icon = {
+                    titleContent = ClubConnectCardDefaults.Title("Card with Stacked Buttons"),
+                    descriptionContent = ClubConnectCardDefaults.Description("This card has buttons stacked vertically with padding."),
+                    leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Email,
                             contentDescription = "Email",

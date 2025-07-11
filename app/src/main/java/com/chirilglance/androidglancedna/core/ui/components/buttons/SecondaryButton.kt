@@ -1,4 +1,4 @@
-package com.chirilglance.androidglancedna.core.ui.components
+package com.chirilglance.androidglancedna.core.ui.components.buttons
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.height
