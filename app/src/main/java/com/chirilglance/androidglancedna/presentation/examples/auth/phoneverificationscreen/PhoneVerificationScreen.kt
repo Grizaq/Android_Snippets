@@ -17,7 +17,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -61,94 +60,77 @@ fun PhoneVerificationScreen(
                 val formattedNumber = (uiState as UiState.Success<String>).data
                 onVerificationRequested(formattedNumber)
             }
-            else -> { /* No action needed */ }
+
+            else -> { /* No action needed */
+            }
         }
     }
 
-    // Use Scaffold for better inset handling
-    Scaffold { innerPadding ->
-        Box(
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        // Scrollable content
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .verticalScroll(scrollState)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center
         ) {
-            // Scrollable content
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(scrollState)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.Center
-            ) {
-                ClubConnectCard(
-                    modifier = Modifier.fillMaxWidth(),
-                    titleContent = ClubConnectCardDefaults.Title("Let's get you verified"),
-                    subtitleContent = ClubConnectCardDefaults.Subtitle("Welcome to Android Glance DNA"),
-                    descriptionContent = ClubConnectCardDefaults.Description(
-                        "We just need your mobile number to get started!"
-                    ),
-                    actions = {
+            ClubConnectCard(modifier = Modifier.fillMaxWidth(),
+                titleContent = ClubConnectCardDefaults.Title("Let's get you verified"),
+                subtitleContent = ClubConnectCardDefaults.Subtitle("Welcome to Android Glance DNA"),
+                descriptionContent = ClubConnectCardDefaults.Description(
+                    "We just need your mobile number to get started!"
+                ),
+                actions = {
+                    Column {
                         Column {
-                            Column {
-                                // Phone input row
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(top = 16.dp)
-                                ) {
-                                    // Country code selector using the separate component
-                                    ClubConnectCountryCodeSelector(
-                                        selectedCountry = selectedCountry,
-                                        onCountrySelected = viewModel::updateSelectedCountry,
-                                        modifier = Modifier.weight(0.35f)
-                                    )
+                            // Phone input row
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 16.dp)
+                            ) {
+                                // Country code selector using the separate component
+                                ClubConnectCountryCodeSelector(
+                                    selectedCountry = selectedCountry,
+                                    onCountrySelected = viewModel::updateSelectedCountry,
+                                    modifier = Modifier.weight(0.35f)
+                                )
 
-                                    Spacer(modifier = Modifier.width(8.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
 
-                                    // Phone number input using the separate component
-                                    ClubConnectPhoneField(
-                                        value = phoneNumber,
-                                        onValueChange = { newValue ->
-                                            viewModel.updatePhoneNumber(newValue)
+                                // Phone number input using the separate component
+                                ClubConnectPhoneField(
+                                    value = phoneNumber,
+                                    onValueChange = { newValue ->
+                                        viewModel.updatePhoneNumber(newValue)
 
-                                            // Check if we need to hide the keyboard after each digit is entered
-                                            if (viewModel.isPhoneNumberComplete()) {
-                                                keyboardController?.hide()
+                                        // Check if we need to hide the keyboard after each digit is entered
+                                        if (viewModel.isPhoneNumberComplete()) {
+                                            keyboardController?.hide()
+                                        }
+                                    },
+                                    isError = phoneNumberError != null,
+                                    onDone = {
+                                        if (viewModel.canVerify()) {
+                                            viewModel.verifyPhoneNumber { formattedNumber ->
+                                                onVerificationRequested(formattedNumber)
                                             }
-                                        },
-                                        isError = phoneNumberError != null,
-                                        onDone = {
-                                            if (viewModel.canVerify()) {
-                                                viewModel.verifyPhoneNumber { formattedNumber ->
-                                                    onVerificationRequested(formattedNumber)
-                                                }
-                                            }
-                                        },
-                                        modifier = Modifier.weight(0.7f)
-                                    )
-                                }
-
-                                // Error message centered below both inputs
-                                phoneNumberError?.let { error ->
-                                    Text(
-                                        text = error,
-                                        color = MaterialTheme.colorScheme.error,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        textAlign = TextAlign.Center,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(top = 8.dp)
-                                    )
-                                }
+                                        }
+                                    },
+                                    modifier = Modifier.weight(0.7f)
+                                )
                             }
 
-                            // API error message
-                            if (uiState is UiState.Error) {
+                            // Error message centered below both inputs
+                            phoneNumberError?.let { error ->
                                 Text(
-                                    text = (uiState as UiState.Error).message,
+                                    text = error,
                                     color = MaterialTheme.colorScheme.error,
-                                    style = MaterialTheme.typography.bodyMedium,
+                                    style = MaterialTheme.typography.bodySmall,
                                     textAlign = TextAlign.Center,
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -156,12 +138,23 @@ fun PhoneVerificationScreen(
                                 )
                             }
                         }
-                    }
-                )
 
-                // Extra space at the bottom to ensure button doesn't overlap
-                Spacer(modifier = Modifier.height(100.dp))
-            }
+                        // API error message
+                        if (uiState is UiState.Error) {
+                            Text(
+                                text = (uiState as UiState.Error).message,
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodyMedium,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 8.dp)
+                            )
+                        }
+                    }
+                })
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Bottom button with proper padding
             Button(
@@ -174,7 +167,6 @@ fun PhoneVerificationScreen(
                 enabled = canVerify,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
                     .padding(16.dp)
                     .imePadding()
             ) {

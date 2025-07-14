@@ -72,6 +72,10 @@ dependencies {
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
 
+    // Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+
     // Optional dependencies
     // implementation(libs.apollo.runtime)
     implementation(libs.hiltNavigationCompose)

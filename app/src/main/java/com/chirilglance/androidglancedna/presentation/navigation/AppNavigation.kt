@@ -30,8 +30,6 @@ fun AppNavigation(navController: NavHostController) {
         }
 
         composable(Screen.Authentication.route) {
-            // Pass the main navController to the authentication screen
-            // so it can navigate back to the home screen when complete
             AuthenticationScreen(mainNavController = navController)
         }
 

@@ -1,12 +1,14 @@
 package com.chirilglance.androidglancedna.presentation.examples.auth
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.chirilglance.androidglancedna.core.ui.scaffold.NavigationState
 import com.chirilglance.androidglancedna.presentation.examples.auth.otpscreen.OtpVerificationScreen
 import com.chirilglance.androidglancedna.presentation.examples.auth.phoneverificationscreen.PhoneVerificationScreen
 import com.chirilglance.androidglancedna.presentation.examples.auth.welcomescreen.WelcomeScreen
