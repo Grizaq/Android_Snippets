@@ -23,6 +23,7 @@ fun GlanceTopAppBar(
     modifier: Modifier = Modifier
 ) {
     // Get screen title based on route
+    // For more specialized scenarios - can hide the topAppBar and display a replacement for it
     val title = getScreenTitle(currentRoute)
 
     TopAppBar(

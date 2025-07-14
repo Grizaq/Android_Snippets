@@ -130,8 +130,7 @@ fun OtpVerificationScreen(
                     .imePadding() // This is the key - ensures buttons stay above keyboard
             ) {
                 // In OtpVerificationScreen.kt
-                PrimaryButton(
-                    text = "Verify",
+                PrimaryButton(text = "Verify",
                     onClick = {
                         viewModel.verifyOtp {
                             onVerificationComplete()
