@@ -48,20 +48,6 @@ Type-safe navigation using sealed classes with proper back stack handling and de
 ### [State Management](core/domain/model/README.md)
 Consistent state management with UiState pattern for predictable UI updates and error handling.
 
-## Example
-
-Here's a quick example of the error handling system in action:
-
-```kotlin
-// In your Composable
-AutoErrorHandler(state = viewModel.uiState)
-
-// The rest is automatic - errors will display as snackbars
-// with appropriate styling based on error type
-```
-
-For detailed examples and implementation details, check the feature-specific README files linked above.
-
 ## General Project Structure
 
 ```
@@ -76,6 +62,8 @@ app/src/main/java/com/chirilglance/androidglancedna/
 │       └── scaffold/       # App scaffold components
 ├── data/                   # Data layer
 │   └── repository/         # Repository implementations
+├── di/                     # di module
+│   └── feature             # Separate package per feature for scalability
 ├── domain/                 # Business logic
 │   ├── models/             # Domain models
 │   └── utils/              # Domain utilities

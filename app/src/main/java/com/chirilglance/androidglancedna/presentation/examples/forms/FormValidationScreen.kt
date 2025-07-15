@@ -13,6 +13,6 @@ fun FormValidationScreen() {
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Text("UI Components Screen - Coming Soon")
+        Text("Forms Validation Components Screen - Coming Soon")
     }
 }

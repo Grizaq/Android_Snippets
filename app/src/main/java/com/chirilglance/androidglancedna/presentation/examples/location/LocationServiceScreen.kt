@@ -13,6 +13,6 @@ fun LocationServiceScreen() {
     modifier = Modifier.fillMaxSize(),
     contentAlignment = Alignment.Center
     ) {
-        Text("UI Components Screen - Coming Soon")
+        Text("Location Search Components Screen - Coming Soon")
     }
 }
