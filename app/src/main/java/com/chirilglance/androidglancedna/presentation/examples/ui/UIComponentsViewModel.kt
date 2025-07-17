@@ -43,11 +43,9 @@ class UIComponentsViewModel @Inject constructor() : ViewModel() {
 
     // Advanced Snackbar examples
     fun showErrorWithAction() {
-        showErrorSnackbar(
-            message = "Failed to save data",
+        showErrorSnackbar(message = "Failed to save data",
             actionLabel = "Retry",
-            onAction = { showSuccessSnackbar("Retry operation started") }
-        )
+            onAction = { showSuccessSnackbar("Retry operation started") })
     }
 
     fun showLongDurationSnackbar() {
