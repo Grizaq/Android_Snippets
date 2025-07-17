@@ -23,4 +23,15 @@ sealed class Screen(val route: String) {
     data object Authentication : Screen("authentication")
     data object LocationServices : Screen("location_services")
     data object StateManagement : Screen("state_management")
+
+    // Profile Management screens
+    data object ProfileManagement : Screen("profile_management")
+    data object ProfileDetails : Screen("profile_details/{profileId}") {
+        override fun createRoute(vararg params: String): String =
+            "profile_details/${params[0]}"
+    }
+    data object ProfileEdit : Screen("profile_edit/{profileId}") {
+        override fun createRoute(vararg params: String): String =
+            "profile_edit/${params[0]}"
+    }
 }

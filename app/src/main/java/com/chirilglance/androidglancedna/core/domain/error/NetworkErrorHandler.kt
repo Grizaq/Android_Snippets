@@ -21,11 +21,32 @@ class NetworkErrorHandler @Inject constructor() {
                 message
             }
             is HttpException -> {
-                val errorMessage = when (error.code()) {
-                    401 -> "Your session has expired. Please log in again."
-                    403 -> "You don't have permission to perform this action."
-                    404 -> "The requested resource was not found."
-                    500, 502, 503, 504 -> "Server error. Please try again later."
+                val errorMessage = when {
+                    // Check for GraphQL-specific error patterns in the response body
+                    error.message().contains("JWT expired", ignoreCase = true) ||
+                            error.message().contains("token expired", ignoreCase = true) ||
+                            error.message().contains("UNAUTHENTICATED", ignoreCase = true) ->
+                        "Your session has expired. Please log in again."
+
+                    error.message().contains("FORBIDDEN", ignoreCase = true) ||
+                            error.code() == 403 ->
+                        "You don't have permission to perform this action."
+
+                    error.message().contains("NOT_FOUND", ignoreCase = true) ||
+                            error.code() == 404 ->
+                        "The requested resource was not found."
+
+                    // Server errors - both HTTP codes and GraphQL error messages
+                    error.code() in listOf(500, 502, 503, 504) ||
+                            error.message().contains("INTERNAL_SERVER_ERROR", ignoreCase = true) ->
+                        "Server error. Please try again later."
+
+                    // Validation errors common in GraphQL
+                    error.message().contains("validation", ignoreCase = true) ||
+                            error.message().contains("VALIDATION_ERROR", ignoreCase = true) ->
+                        "Invalid input. Please check your data and try again."
+
+                    // Default case
                     else -> "An error occurred: ${error.message()}"
                 }
                 SnackbarManager.showError(

@@ -7,49 +7,71 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.chirilglance.androidglancedna.core.ui.components.GlanceSnackbarHost
+import com.chirilglance.androidglancedna.presentation.common.useActiveProfile
 import com.chirilglance.androidglancedna.presentation.navigation.Screen
 
+/**
+ * Main scaffold for the application that includes the top app bar and bottom navigation.
+ * Uses role-based navigation to adapt based on the active user profile.
+ */
 @Composable
 fun GlanceAppScaffold(
-    navController: NavHostController, modifier: Modifier = Modifier, content: @Composable () -> Unit
+    navController: NavHostController,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
 ) {
-    val snackbarHostState = remember { SnackbarHostState() }
+    val activeProfile = useActiveProfile()
+    val profileKey = activeProfile?.profileId ?: "no-profile"
 
-    // Get current route to determine navigation state
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route ?: ""
+    // The key function should wrap the entire content that needs to be recomposed
+    key(profileKey) {
+        val snackbarHostState = remember { SnackbarHostState() }
 
-    // Determine which navigation elements to show
-    val navigationState = remember(currentRoute) {
-        getNavigationState(currentRoute)
-    }
+        // Get current route to determine navigation state
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentRoute = navBackStackEntry?.destination?.route ?: ""
 
-    Scaffold(modifier = modifier.fillMaxSize(), snackbarHost = {
-        GlanceSnackbarHost(hostState = snackbarHostState)
-    }, topBar = {
-        if (navigationState.showTopBar) {
-            GlanceTopAppBar(
-                navController = navController, currentRoute = currentRoute
-            )
+        // Determine which navigation elements to show
+        val navigationState = remember(currentRoute) {
+            getNavigationState(currentRoute)
         }
-    }, bottomBar = {
-        if (navigationState.showBottomNav) {
-            GlanceBottomNavigation(
-                navController = navController, currentRoute = currentRoute
-            )
-        }
-    }) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            content()
+
+        Scaffold(
+            modifier = modifier.fillMaxSize(),
+            snackbarHost = {
+                GlanceSnackbarHost(hostState = snackbarHostState)
+            },
+            topBar = {
+                if (navigationState.showTopBar) {
+                    GlanceTopAppBar(
+                        navController = navController,
+                        currentRoute = currentRoute
+                    )
+                }
+            },
+            bottomBar = {
+                if (navigationState.showBottomNav) {
+                    // Use role-based navigation instead of static navigation
+                    GlanceBottomNavigation(
+                        navController = navController,
+                        currentRoute = currentRoute
+                    )
+                }
+            }
+        ) { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+                content()
+            }
         }
     }
 }
@@ -70,18 +92,21 @@ private fun getNavigationState(currentRoute: String): NavigationState {
     // Define screens that require special navigation handling
     return when (baseRoute) {
         // Screens with no navigation elements
-        Screen.PhoneVerification.route, Screen.OtpVerification.route.split("/")[0], Screen.Welcome.route -> NavigationState(
-            showTopBar = false,
-            showBottomNav = false
-        )
+        Screen.PhoneVerification.route, Screen.OtpVerification.route.split("/")[0], Screen.Welcome.route ->
+            NavigationState(
+                showTopBar = false,
+                showBottomNav = false
+            )
 
         // Screens with only top bar
-        Screen.FormValidation.route -> NavigationState(showTopBar = true, showBottomNav = false)
+        Screen.FormValidation.route, "profile_edit" ->
+            NavigationState(showTopBar = true, showBottomNav = false)
 
         // Screens with only bottom bar
         // Add your screens here
 
         // Default: show both navigation elements
-        else -> NavigationState(showTopBar = true, showBottomNav = true)
+        else ->
+            NavigationState(showTopBar = true, showBottomNav = true)
     }
 }

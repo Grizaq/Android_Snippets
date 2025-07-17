@@ -4,6 +4,9 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.firebase)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 android {
@@ -75,6 +78,29 @@ dependencies {
     // Retrofit
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
+
+    // Maps API autocomplete
+    implementation(libs.google.maps)
+    implementation(libs.google.places)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+
+    // Image handling
+    implementation(libs.coil)
+
+    // Crashlitics
+    implementation(libs.firebase.crashlytics)
+
+    // Security for EncryptedSharedPreferences
+    implementation(libs.androidx.security.crypto)
+
+    // Calendar selector
+    implementation(libs.kizitonwose.calendar.compose)
+
+    // Kotlin Serialization plugin - Enables @Serializable annotation processing for data classes
+    implementation(libs.kotlinx.serialization.json)
 
     // Optional dependencies
     // implementation(libs.apollo.runtime)
