@@ -1,12 +1,17 @@
 package com.chirilglance.androidglancedna.presentation.examples.auth.phoneverificationscreen
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chirilglance.androidglancedna.core.domain.model.UiState
+import com.chirilglance.androidglancedna.core.validation.ValidationResult
 import com.chirilglance.androidglancedna.data.repository.auth.AuthRepository
 import com.chirilglance.androidglancedna.domain.models.CountryCode
 import com.chirilglance.androidglancedna.domain.utils.CountryCodeProvider
-import com.chirilglance.androidglancedna.domain.utils.PhoneNumberValidator
+import com.chirilglance.androidglancedna.domain.validators.PhoneNumberValidator
+import com.chirilglance.androidglancedna.presentation.components.form.FormValidationManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,60 +20,48 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/**
- * ViewModel for the phone verification screen
- */
 @HiltViewModel
 class PhoneVerificationViewModel @Inject constructor(
-    private val phoneNumberValidator: PhoneNumberValidator,
+    val phoneNumberValidator: PhoneNumberValidator,
     private val authRepository: AuthRepository
 ) : ViewModel() {
+
     // UI state
     private val _uiState = MutableStateFlow<UiState<String>>(UiState.Empty)
     val uiState: StateFlow<UiState<String>> = _uiState.asStateFlow()
 
-    // Phone number
-    private val _phoneNumber = MutableStateFlow("")
-    val phoneNumber: StateFlow<String> = _phoneNumber.asStateFlow()
+    // Form fields - Using mutableStateOf for better compose integration
+    var phoneNumber by mutableStateOf("")
+        private set
 
-    // Selected country
-    private val _selectedCountry = MutableStateFlow(CountryCodeProvider.getDefaultCountry())
-    val selectedCountry: StateFlow<CountryCode> = _selectedCountry.asStateFlow()
+    var selectedCountry by mutableStateOf(CountryCodeProvider.getDefaultCountry())
+        private set
 
-    // Phone number error
-    private val _phoneNumberError = MutableStateFlow<String?>(null)
-    val phoneNumberError: StateFlow<String?> = _phoneNumberError.asStateFlow()
+    // Form validation manager
+    val formValidator = FormValidationManager(
+        { validatePhone(phoneNumber) }
+    )
 
-    /**
-     * Update phone number and validate
-     */
+    // Update methods
     fun updatePhoneNumber(number: String) {
-        _phoneNumber.update { number }
-        validatePhoneNumber()
-    }
-
-    /**
-     * Update selected country and validate
-     */
-    fun updateSelectedCountry(country: CountryCode) {
-        _selectedCountry.update { country }
-        validatePhoneNumber()
-    }
-
-    /**
-     * Validate phone number format
-     */
-    private fun validatePhoneNumber() {
-        val error = phoneNumberValidator.validatePhoneNumber(
-            phoneNumber.value,
-            selectedCountry.value
-        )
-        _phoneNumberError.update { error }
-
+        phoneNumber = number
         // Reset any API error message when user changes input
         if (_uiState.value is UiState.Error) {
             _uiState.update { UiState.Empty }
         }
+    }
+
+    fun updateSelectedCountry(country: CountryCode) {
+        selectedCountry = country
+        // Reset any API error message when user changes input
+        if (_uiState.value is UiState.Error) {
+            _uiState.update { UiState.Empty }
+        }
+    }
+
+    // Validation methods
+    fun validatePhone(value: String): ValidationResult {
+        return phoneNumberValidator.validate(value, selectedCountry)
     }
 
     /**
@@ -76,13 +69,15 @@ class PhoneVerificationViewModel @Inject constructor(
      */
     fun verifyPhoneNumber(onSuccess: (String) -> Unit) {
         // Validate phone number first
-        validatePhoneNumber()
-        if (phoneNumberError.value != null) {
+        if (!formValidator.validateAll()) {
             return
         }
 
         // Get formatted number for API
         val formattedNumber = getFormattedPhoneNumber()
+
+        // Set loading state
+        _uiState.update { UiState.Loading }
 
         viewModelScope.launch {
             authRepository.verifyPhoneNumber(formattedNumber).collect { state ->
@@ -100,30 +95,27 @@ class PhoneVerificationViewModel @Inject constructor(
      * Get formatted phone number for API use
      */
     fun getFormattedPhoneNumber(): String {
-        return phoneNumberValidator.formatForApi(phoneNumber.value, selectedCountry.value)
+        return phoneNumberValidator.formatForApi(phoneNumber, selectedCountry)
     }
 
     /**
      * Get formatted phone number for display
      */
     fun getFormattedPhoneNumberForDisplay(): String {
-        return phoneNumberValidator.formatForDisplay(phoneNumber.value, selectedCountry.value)
+        return phoneNumberValidator.formatForDisplay(phoneNumber, selectedCountry)
     }
 
     /**
      * Check if phone number has reached the expected length for the selected country
      */
     fun isPhoneNumberComplete(): Boolean {
-        // No need to manually clean the number and check against regex here
-        // Just use the validator to check if there are any errors
-        return phoneNumberValidator.validatePhoneNumber(phoneNumber.value, selectedCountry.value) == null &&
-                phoneNumber.value.isNotBlank()
+        return validatePhone(phoneNumber).isValid && phoneNumber.isNotBlank()
     }
 
     /**
      * Check if the phone number can be verified (valid and not empty)
      */
     fun canVerify(): Boolean {
-        return phoneNumber.value.isNotBlank() && phoneNumberError.value == null
+        return phoneNumber.isNotBlank() && validatePhone(phoneNumber).isValid
     }
 }

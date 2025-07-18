@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
  * @param allowCharacters Function to determine which characters are allowed (digits, formatting chars, etc.)
  */
 @Composable
-fun ClubConnectPhoneField(
+fun DefaultPhoneField(
     value: String,
     onValueChange: (String) -> Unit,
     isError: Boolean = false,

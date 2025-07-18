@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.dp
  * @param contentSpacing The spacing between different content sections
  */
 @Composable
-fun ClubConnectCard(
+fun DefaultCard(
     modifier: Modifier = Modifier,
     titleContent: @Composable () -> Unit,
     subtitleContent: @Composable (() -> Unit)? = null,

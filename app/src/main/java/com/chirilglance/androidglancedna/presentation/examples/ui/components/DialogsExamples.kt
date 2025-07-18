@@ -30,9 +30,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.chirilglance.androidglancedna.core.ui.components.buttons.PrimaryButton
 import com.chirilglance.androidglancedna.core.ui.components.buttons.SecondaryButton
-import com.chirilglance.androidglancedna.core.ui.components.dialogs.ClubConnectDialog
-import com.chirilglance.androidglancedna.core.ui.components.dialogs.ClubConnectDialogDefaults
-import com.chirilglance.androidglancedna.core.ui.components.dialogs.ClubConnectDialogStateful
+import com.chirilglance.androidglancedna.core.ui.components.dialogs.DefaultDialog
+import com.chirilglance.androidglancedna.core.ui.components.dialogs.DefaultsDialog
+import com.chirilglance.androidglancedna.core.ui.components.dialogs.DefaultDialogStateful
 import com.chirilglance.androidglancedna.presentation.examples.ui.ComponentSection
 
 @Composable
@@ -87,7 +87,7 @@ private fun SimpleNotificationDialogExample() {
     )
 
     if (showDialog) {
-        ClubConnectDialogDefaults.NotificationDialog(title = "Operation Successful",
+        DefaultsDialog.NotificationDialog(title = "Operation Successful",
             message = "Your changes have been saved successfully.",
             buttonText = "OK",
             onDismiss = { showDialog = false })
@@ -136,7 +136,7 @@ private fun ConfirmationDialogExample() {
     }
 
     if (showDialog) {
-        ClubConnectDialog(
+        DefaultDialog(
             onDismissRequest = { showDialog = false },
             title = "Confirm Action",
             message = "Are you sure you want to proceed with this action? This cannot be undone.",
@@ -255,7 +255,7 @@ private fun CustomContentDialogExample() {
 
     // Confirmation dialog showing selected users
     if (showDialog) {
-        ClubConnectDialog(onDismissRequest = { showDialog = false },
+        DefaultDialog(onDismissRequest = { showDialog = false },
             title = "Confirm Selected Users",
             customContent = {
                 Column(modifier = Modifier.fillMaxWidth()) {
@@ -358,7 +358,7 @@ private fun StatefulDialogExample() {
         )
     }
 
-    ClubConnectDialogStateful(
+    DefaultDialogStateful(
         showDialog = showDialog,
         onDialogDismiss = { showDialog = false },
         title = "Warning",

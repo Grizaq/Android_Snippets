@@ -25,9 +25,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.chirilglance.androidglancedna.core.domain.model.UiState
-import com.chirilglance.androidglancedna.core.ui.components.ClubConnectCard
+import com.chirilglance.androidglancedna.core.ui.components.DefaultCard
 import com.chirilglance.androidglancedna.core.ui.components.ClubConnectCardDefaults
-import com.chirilglance.androidglancedna.core.ui.components.ClubConnectOtpField
+import com.chirilglance.androidglancedna.core.ui.components.DefaultOtpField
 import com.chirilglance.androidglancedna.core.ui.components.buttons.PrimaryButton
 
 @Composable
@@ -58,7 +58,7 @@ fun OtpVerificationScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.Center
         ) {
-            ClubConnectCard(modifier = Modifier.fillMaxWidth(),
+            DefaultCard(modifier = Modifier.fillMaxWidth(),
                 titleContent = ClubConnectCardDefaults.Title("Verify your account"),
                 subtitleContent = ClubConnectCardDefaults.Subtitle("SMS Verification"),
                 descriptionContent = ClubConnectCardDefaults.Description(
@@ -67,7 +67,7 @@ fun OtpVerificationScreen(
                 actions = {
                     Column {
                         // OTP input field using the new component
-                        ClubConnectOtpField(
+                        DefaultOtpField(
                             otpDigits = otpDigits,
                             onDigitChange = viewModel::updateOtpDigit,
                             onComplete = {

@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.chirilglance.androidglancedna.core.ui.components.ClubConnectCard
+import com.chirilglance.androidglancedna.core.ui.components.DefaultCard
 import com.chirilglance.androidglancedna.core.ui.components.ClubConnectCardDefaults
 
 @Composable
@@ -23,7 +23,7 @@ fun WelcomeScreen(
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            ClubConnectCard(
+            DefaultCard(
                 modifier = Modifier.align(Alignment.Center),
                 titleContent = ClubConnectCardDefaults.Title("Verification Successful!"),
                 subtitleContent = ClubConnectCardDefaults.Subtitle("Welcome to Android Glance DNA"),

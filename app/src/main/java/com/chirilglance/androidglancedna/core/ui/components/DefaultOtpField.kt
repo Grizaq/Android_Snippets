@@ -56,7 +56,7 @@ import kotlinx.coroutines.delay
  * @param autoFocusFirst Whether to automatically focus the first field when displayed
  */
 @Composable
-fun ClubConnectOtpField(
+fun DefaultOtpField(
     otpDigits: List<String>,
     onDigitChange: (Int, String) -> Unit,
     onComplete: () -> Unit,

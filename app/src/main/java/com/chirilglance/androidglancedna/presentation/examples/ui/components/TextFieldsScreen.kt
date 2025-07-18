@@ -22,7 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.chirilglance.androidglancedna.core.ui.components.ClubConnectTextField
+import com.chirilglance.androidglancedna.core.ui.components.DefaultTextField
 import com.chirilglance.androidglancedna.core.ui.components.LabeledTextField
 import com.chirilglance.androidglancedna.core.ui.components.NumberTextField
 import com.chirilglance.androidglancedna.presentation.examples.ui.ComponentSection
@@ -55,7 +55,7 @@ fun TextFieldsScreen() {
 
             // Basic Text Field
             var text by remember { mutableStateOf("") }
-            ClubConnectTextField(
+            DefaultTextField(
                 value = text,
                 onValueChange = { text = it },
                 label = "Basic Text Field",
@@ -75,7 +75,7 @@ fun TextFieldsScreen() {
             // Email Text Field with Validation
             var emailText by remember { mutableStateOf("") }
             var emailError by remember { mutableStateOf<String?>(null) }
-            ClubConnectTextField(
+            DefaultTextField(
                 value = emailText,
                 onValueChange = {
                     emailText = it
@@ -143,7 +143,6 @@ fun TextFieldsScreen() {
                 onValueChange = { labeledCardText = it },
                 label = "Username:",
                 hint = "Enter username...",
-                elevation = 2.dp,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -151,7 +150,7 @@ fun TextFieldsScreen() {
 
             // Text Field with Icon
             var searchText by remember { mutableStateOf("") }
-            ClubConnectTextField(
+            DefaultTextField(
                 value = searchText,
                 onValueChange = { searchText = it },
                 label = "Search",
