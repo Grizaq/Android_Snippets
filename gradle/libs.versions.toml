@@ -25,6 +25,7 @@ googleMapsVersion = "18.2.0"
 placesVersion = "3.3.0"
 kizitonwose-calendar = "2.6.0"
 kotlinSerialization = "1.6.2"
+browser = "1.6.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -89,6 +90,9 @@ kizitonwose-calendar-compose = { module = "com.kizitonwose.calendar:compose", ve
 
 # Kotlin Serialization plugin - Enables @Serializable annotation processing for data classes
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinSerialization" }
+
+# Browser handling
+androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "browser" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

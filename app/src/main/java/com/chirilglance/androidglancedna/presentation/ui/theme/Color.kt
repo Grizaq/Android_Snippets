@@ -17,3 +17,4 @@ val AccentGreen = Color(0xFF89DB04)
 val WhiteDefault = Color(0xFFFFFFFF)
 val HintColor = Color(0x3C3C434D)
 val ErrorRed = Color(0xFFFF7C70)
+val TransparentBlack20 = Color(0x33000000) // #33000000 20%

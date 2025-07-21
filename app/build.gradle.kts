@@ -102,6 +102,9 @@ dependencies {
     // Kotlin Serialization plugin - Enables @Serializable annotation processing for data classes
     implementation(libs.kotlinx.serialization.json)
 
+    // Browser handling
+    implementation(libs.androidx.browser)
+
     // Optional dependencies
     // implementation(libs.apollo.runtime)
     implementation(libs.hiltNavigationCompose)
