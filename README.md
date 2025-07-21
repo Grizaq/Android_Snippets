@@ -30,7 +30,7 @@ This is not a library to be imported, but rather a collection of examples to lea
 
 ## Key Features
 
-### [UI Components](core/ui/components/README.md)
+### [UI Components](app/src/main/java.com/chirilglance/androidglanced na/core/ui/README.md)
 Reusable UI components including buttons, text fields, cards, and snackbars with consistent styling and support for loading states.
 
 ### [Error Handling](core/domain/error/README.md)
