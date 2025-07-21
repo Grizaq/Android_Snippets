@@ -21,8 +21,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.chirilglance.androidglancedna.core.ui.components.DefaultCountryCodeSelector
 import com.chirilglance.androidglancedna.core.ui.components.DefaultPhoneField
+import com.chirilglance.androidglancedna.core.validation.ValidationUtils
 import com.chirilglance.androidglancedna.domain.models.CountryCode
-import com.chirilglance.androidglancedna.domain.validators.PhoneNumberValidator
+import com.chirilglance.androidglancedna.domain.validators.PhoneNumberFormatter
 
 /**
  * A validated phone number field with country code selector
@@ -34,7 +35,7 @@ fun ValidatedPhoneField(
     onPhoneNumberChange: (String) -> Unit,
     selectedCountry: CountryCode,
     onCountrySelected: (CountryCode) -> Unit,
-    phoneNumberValidator: PhoneNumberValidator,
+    phoneNumberValidator: PhoneNumberFormatter,
     modifier: Modifier = Modifier,
     initiallyValidated: Boolean = false,
     validateOnChange: Boolean = false,
@@ -48,7 +49,7 @@ fun ValidatedPhoneField(
 
     // Store validation result
     val validationResult = remember(phoneNumber, selectedCountry) {
-        phoneNumberValidator.validate(phoneNumber, selectedCountry)
+        ValidationUtils.validatePhoneNumber(phoneNumber, selectedCountry)
     }
 
     // Determine if we should show an error

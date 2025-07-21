@@ -23,9 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
@@ -34,11 +32,11 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.chirilglance.androidglancedna.core.domain.model.UiState
+import com.chirilglance.androidglancedna.core.ui.components.DateOfBirthField
+import com.chirilglance.androidglancedna.core.ui.components.EventDateField
 import com.chirilglance.androidglancedna.core.ui.components.LabeledTextField
 import com.chirilglance.androidglancedna.core.ui.components.buttons.PrimaryButton
 import com.chirilglance.androidglancedna.core.ui.components.buttons.SecondaryButton
-import com.chirilglance.androidglancedna.presentation.components.form.DateOfBirthField
-import com.chirilglance.androidglancedna.presentation.components.form.EventDateField
 import com.chirilglance.androidglancedna.presentation.components.form.ValidatedPhoneField
 
 @Composable
@@ -49,10 +47,7 @@ fun FormValidationScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
     val formSubmissionState by viewModel.formSubmissionState.collectAsState()
-    val isValidated = viewModel.formValidator.isValidated.value
-
-    // Track currently focused field
-    var focusedField by remember { mutableStateOf("") }
+    val fieldErrors by viewModel.fieldErrors.collectAsState()
 
     // Monitor form submission state for success/error
     LaunchedEffect(formSubmissionState) {
@@ -65,14 +60,12 @@ fun FormValidationScreen(
                 snackbarHostState.showSnackbar((formSubmissionState as UiState.Error).message)
             }
 
-            else -> { /* No action needed */
-            }
+            else -> { /* No action needed */ }
         }
     }
 
-    // Needed to have validation kick in only after the user interacts with the field
+    // Reset all validation flags when screen is first loaded
     LaunchedEffect(key1 = Unit) {
-        // Reset all validation flags when screen is first loaded
         viewModel.resetValidationFlags()
     }
 
@@ -85,7 +78,8 @@ fun FormValidationScreen(
     ) {
         // Header
         Text(
-            text = "Form Validation Example", style = MaterialTheme.typography.headlineMedium
+            text = "Form Validation Example",
+            style = MaterialTheme.typography.headlineMedium
         )
 
         Text(
@@ -95,7 +89,8 @@ fun FormValidationScreen(
 
         // Form Fields - Basic Information
         Column(
-            modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Section Title
             Text(
@@ -116,18 +111,14 @@ fun FormValidationScreen(
                 onValueChange = viewModel::updateFullName,
                 label = "Full Name",
                 hint = "Enter your full name",
-                errorMessage = if (viewModel.isFullNameValidated || isValidated) viewModel.validateFullName(
-                    viewModel.fullName
-                ).errorMessage else null,
+                errorMessage = fieldErrors["fullName"],
                 keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Next,
                 singleLine = true,
                 maxLines = 1,
-                isFocused = focusedField == "fullName",
                 onFocusChanged = { isFocused ->
-                    focusedField = if (isFocused) "fullName" else ""
                     if (!isFocused) {
-                        viewModel.validateFullNameField()
+                        viewModel.markFieldAsTouched("fullName")
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -139,43 +130,39 @@ fun FormValidationScreen(
                 onValueChange = viewModel::updateEmail,
                 label = "Email Address",
                 hint = "your@email.com",
-                errorMessage = if (viewModel.isEmailValidated || isValidated) viewModel.validateEmail(
-                    viewModel.email
-                ).errorMessage else null,
+                errorMessage = fieldErrors["email"],
                 keyboardType = KeyboardType.Email,
                 imeAction = ImeAction.Next,
                 singleLine = true,
                 maxLines = 1,
-                isFocused = focusedField == "email",
                 onFocusChanged = { isFocused ->
-                    focusedField = if (isFocused) "email" else ""
                     if (!isFocused) {
-                        viewModel.validateEmailField()
+                        viewModel.markFieldAsTouched("email")
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Phone field with validation - consistent with auth flow
+            // Phone field with validation
             ValidatedPhoneField(
                 phoneNumber = viewModel.phoneNumber,
                 onPhoneNumberChange = viewModel::updatePhoneNumber,
                 selectedCountry = viewModel.selectedCountry,
                 onCountrySelected = viewModel::updateSelectedCountry,
                 phoneNumberValidator = viewModel.phoneNumberValidator,
-                externalValidationTriggered = viewModel.isPhoneValidated || isValidated,
+                externalValidationTriggered = fieldErrors.containsKey("phone") && fieldErrors["phone"] != null,
                 onDone = null,
                 initiallyValidated = false,
-                validateOnChange = true
+                validateOnChange = true,
+                modifier = Modifier.fillMaxWidth()
             )
 
             // Date of Birth field with validation
             DateOfBirthField(
                 selectedDate = viewModel.birthDate,
                 onDateSelected = viewModel::updateBirthDate,
-                errorMessage = if (viewModel.isBirthDateValidated || isValidated) viewModel.validateBirthDate().errorMessage else null,
-                modifier = Modifier.fillMaxWidth(),
-                isFocused = focusedField == "birthDate"
+                errorMessage = fieldErrors["birthDate"],
+                modifier = Modifier.fillMaxWidth()
             )
         }
 
@@ -183,7 +170,8 @@ fun FormValidationScreen(
 
         // Form Fields - Additional Information
         Column(
-            modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Section Title
             Text(
@@ -199,12 +187,11 @@ fun FormValidationScreen(
                 includeTime = true,
                 selectedTime = viewModel.eventTime,
                 onTimeSelected = viewModel::updateEventTime,
-                errorMessage = if (viewModel.isEventDateValidated || isValidated) viewModel.validateEventDate().errorMessage else null,
+                errorMessage = fieldErrors["eventDate"],
                 label = "Event Date & Time",
                 hint = "Select event date and time",
                 modifier = Modifier.fillMaxWidth(),
-                allowPastDates = false,
-                isFocused = focusedField == "eventDate"
+                allowPastDates = false
             )
 
             // Password field with validation
@@ -213,9 +200,7 @@ fun FormValidationScreen(
                 onValueChange = viewModel::updatePassword,
                 label = "Password",
                 hint = "Enter a secure password",
-                errorMessage = if (viewModel.isPasswordValidated || isValidated) viewModel.validatePassword(
-                    viewModel.password
-                ).errorMessage else null,
+                errorMessage = fieldErrors["password"],
                 keyboardType = KeyboardType.Password,
                 imeAction = ImeAction.Next,
                 singleLine = true,
@@ -224,11 +209,9 @@ fun FormValidationScreen(
                     horizontal = 16.dp, vertical = 8.dp
                 ),
                 visualTransformation = PasswordVisualTransformation(),
-                isFocused = focusedField == "password",
                 onFocusChanged = { isFocused ->
-                    focusedField = if (isFocused) "password" else ""
                     if (!isFocused) {
-                        viewModel.validatePasswordField()
+                        viewModel.markFieldAsTouched("password")
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -240,9 +223,7 @@ fun FormValidationScreen(
                 onValueChange = viewModel::updatePasswordConfirmation,
                 label = "Confirm Password",
                 hint = "Re-enter your password",
-                errorMessage = if (viewModel.isPasswordConfirmationValidated || isValidated) viewModel.validatePasswordConfirmation(
-                    viewModel.password, viewModel.passwordConfirmation
-                ).errorMessage else null,
+                errorMessage = fieldErrors["passwordConfirmation"],
                 keyboardType = KeyboardType.Password,
                 imeAction = ImeAction.Next,
                 singleLine = true,
@@ -251,11 +232,9 @@ fun FormValidationScreen(
                     horizontal = 16.dp, vertical = 8.dp
                 ),
                 visualTransformation = PasswordVisualTransformation(),
-                isFocused = focusedField == "passwordConfirmation",
                 onFocusChanged = { isFocused ->
-                    focusedField = if (isFocused) "passwordConfirmation" else ""
                     if (!isFocused) {
-                        viewModel.validatePasswordConfirmationField()
+                        viewModel.markFieldAsTouched("passwordConfirmation")
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -267,9 +246,7 @@ fun FormValidationScreen(
                 onValueChange = viewModel::updateNumber,
                 label = "Number",
                 hint = "Enter a whole number",
-                errorMessage = if (viewModel.isNumberValidated || isValidated) viewModel.validateNumber(
-                    viewModel.numberValue
-                ).errorMessage else null,
+                errorMessage = fieldErrors["number"],
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Next,
                 singleLine = true,
@@ -277,11 +254,9 @@ fun FormValidationScreen(
                 contentPadding = PaddingValues(
                     horizontal = 16.dp, vertical = 8.dp
                 ),
-                isFocused = focusedField == "number",
                 onFocusChanged = { isFocused ->
-                    focusedField = if (isFocused) "number" else ""
                     if (!isFocused) {
-                        viewModel.validateNumberField()
+                        viewModel.markFieldAsTouched("number")
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -293,19 +268,15 @@ fun FormValidationScreen(
                 onValueChange = viewModel::updateBio,
                 label = "Short Bio",
                 hint = "Tell us about yourself",
-                errorMessage = if (viewModel.isBioValidated || isValidated) viewModel.validateBio(
-                    viewModel.bio
-                ).errorMessage else null,
+                errorMessage = fieldErrors["bio"],
                 maxLines = 3,
                 contentPadding = PaddingValues(
                     horizontal = 16.dp, vertical = 8.dp
                 ),
                 singleLine = false,
-                isFocused = focusedField == "bio",
                 onFocusChanged = { isFocused ->
-                    focusedField = if (isFocused) "bio" else ""
                     if (!isFocused) {
-                        viewModel.validateBioField()
+                        viewModel.markFieldAsTouched("bio")
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -319,7 +290,8 @@ fun FormValidationScreen(
             is UiState.Loading -> {
                 // Show loading indicator
                 Box(
-                    modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()
                 }

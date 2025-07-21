@@ -1,5 +1,6 @@
 package com.chirilglance.androidglancedna.core.validation
 
+import com.chirilglance.androidglancedna.domain.models.CountryCode
 import java.util.regex.Pattern
 
 /**
@@ -30,6 +31,29 @@ object ValidationUtils {
             name.length < MIN_NAME_LENGTH -> ValidationResult.Invalid("$fieldName is too short")
             else -> ValidationResult.Valid
         }
+    }
+
+    /**
+     * Phone number validation
+     * This is a simple wrapper that delegates to the injected PhoneNumberValidator
+     * @param phoneNumber The phone number to validate
+     * @param countryCode The country code to validate against
+     * @return ValidationResult indicating if the phone number is valid
+     */
+    fun validatePhoneNumber(phoneNumber: String, countryCode: CountryCode): ValidationResult {
+        // Get the clean number (digits only)
+        val cleanNumber = phoneNumber.replace(Regex("[^0-9]"), "")
+
+        if (cleanNumber.isEmpty()) {
+            return ValidationResult.Invalid("Phone number is required")
+        }
+
+        // Check against the country's pattern
+        if (!cleanNumber.matches(Regex(countryCode.pattern))) {
+            return ValidationResult.Invalid("Invalid phone number format for ${countryCode.name}")
+        }
+
+        return ValidationResult.Valid
     }
 
     /**

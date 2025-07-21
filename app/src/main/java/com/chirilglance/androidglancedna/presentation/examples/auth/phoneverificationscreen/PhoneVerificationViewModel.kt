@@ -7,10 +7,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chirilglance.androidglancedna.core.domain.model.UiState
 import com.chirilglance.androidglancedna.core.validation.ValidationResult
+import com.chirilglance.androidglancedna.core.validation.ValidationUtils
 import com.chirilglance.androidglancedna.data.repository.auth.AuthRepository
 import com.chirilglance.androidglancedna.domain.models.CountryCode
 import com.chirilglance.androidglancedna.domain.utils.CountryCodeProvider
-import com.chirilglance.androidglancedna.domain.validators.PhoneNumberValidator
+import com.chirilglance.androidglancedna.domain.validators.PhoneNumberFormatter
 import com.chirilglance.androidglancedna.presentation.components.form.FormValidationManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +23,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PhoneVerificationViewModel @Inject constructor(
-    val phoneNumberValidator: PhoneNumberValidator,
+    val phoneNumberValidator: PhoneNumberFormatter,
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
@@ -61,7 +62,7 @@ class PhoneVerificationViewModel @Inject constructor(
 
     // Validation methods
     fun validatePhone(value: String): ValidationResult {
-        return phoneNumberValidator.validate(value, selectedCountry)
+        return ValidationUtils.validatePhoneNumber(value, selectedCountry)
     }
 
     /**
