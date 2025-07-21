@@ -33,19 +33,22 @@ This is not a library to be imported, but rather a collection of examples to lea
 ### [UI Components](app/src/main/java/com/chirilglance/androidglancedna/core/ui/README.md)
 Reusable UI components including buttons, text fields, cards, and snackbars with consistent styling and support for loading states.
 
-### [Error Handling](core/domain/error/README.md)
+### [Role-Based Profile Management System](app/src/main/java/com/chirilglance/androidglancedna/presentation/examples/profile/README.md)
+Reusable UI components including buttons, text fields, cards, and snackbars with consistent styling and support for loading states.
+
+### [Error Handling](app/src/main/java/com/chirilglance/androidglancedna/core/domain/error/README.md)
 Automatic error handling system that displays network and validation errors as snackbars without boilerplate code.
 
-### [Authentication](presentation/examples/auth/README.md)
+### [Authentication](app/src/main/java/com/chirilglance/androidglancedna/presentation/examples/auth/README.md)
 Complete, commonly used, phone verification and OTP flow with timer and resend functionality.
 
-### [Form Validation](presentation/examples/forms/README.md)
+### [Form Validation](app/src/main/java/com/chirilglance/androidglancedna/core/validation/README.md)
 Real-time input validation with immediate feedback.
 
-### [Navigation](presentation/navigation/README.md)
+### [Navigation](app/src/main/java/com/chirilglance/androidglancedna/presentation/navigation/README.md)
 Type-safe navigation using sealed classes with proper back stack handling and deep link support.
 
-### [State Management](core/domain/model/README.md)
+### [State Management](app/src/main/java/com/chirilglance/androidglancedna/core/domain/model/README.md)
 Consistent state management with UiState pattern for predictable UI updates and error handling.
 
 ## General Project Structure
