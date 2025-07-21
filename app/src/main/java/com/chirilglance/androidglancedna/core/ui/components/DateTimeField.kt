@@ -1,4 +1,4 @@
-package com.chirilglance.androidglancedna.presentation.components.form
+package com.chirilglance.androidglancedna.core.ui.components
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog

@@ -10,8 +10,7 @@ import com.chirilglance.androidglancedna.core.validation.ValidationResult
 import com.chirilglance.androidglancedna.core.validation.ValidationUtils
 import com.chirilglance.androidglancedna.domain.models.CountryCode
 import com.chirilglance.androidglancedna.domain.utils.CountryCodeProvider
-import com.chirilglance.androidglancedna.domain.validators.PhoneNumberValidator
-import com.chirilglance.androidglancedna.presentation.components.form.FormValidationManager
+import com.chirilglance.androidglancedna.domain.validators.PhoneNumberFormatter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +24,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FormValidationViewModel @Inject constructor(
-    val phoneNumberValidator: PhoneNumberValidator
+    val phoneNumberValidator: PhoneNumberFormatter
 ) : ViewModel() {
 
     // Basic form fields
@@ -64,97 +63,52 @@ class FormValidationViewModel @Inject constructor(
     var passwordConfirmation by mutableStateOf("")
         private set
 
-    // Field validation state
-    var isFullNameValidated by mutableStateOf(false)
-        private set
-
-    var isEmailValidated by mutableStateOf(false)
-        private set
-
-    var isPhoneValidated by mutableStateOf(false)
-        private set
-
-    var isBirthDateValidated by mutableStateOf(false)
-        private set
-
-    var isEventDateValidated by mutableStateOf(false)
-        private set
-
-    var isNumberValidated by mutableStateOf(false)
-        private set
-
-    var isBioValidated by mutableStateOf(false)
-        private set
-
-    var isPasswordValidated by mutableStateOf(false)
-        private set
-
-    var isPasswordConfirmationValidated by mutableStateOf(false)
-        private set
-
     // UI state for form submission
     private val _formSubmissionState = MutableStateFlow<UiState<Unit>>(UiState.Empty)
     val formSubmissionState: StateFlow<UiState<Unit>> = _formSubmissionState.asStateFlow()
 
-    // Form validation manager
-    val formValidator = FormValidationManager(
-        { validateFullName(fullName) },
-        { validateEmail(email) },
-        { validatePhone(phoneNumber) },
-        { validateBio(bio) },
-        { validateBirthDate() },
-        { validateEventDate() },
-        { validateNumber(numberValue) },
-        { validatePassword(password) },
-        { validatePasswordConfirmation(password, passwordConfirmation) }
-    )
+    // Field validation errors - map of field names to error messages
+    private val _fieldErrors = MutableStateFlow<Map<String, String?>>(emptyMap())
+    val fieldErrors: StateFlow<Map<String, String?>> = _fieldErrors.asStateFlow()
+
+    // Track which fields have been "touched" (user interacted with them)
+    private val _touchedFields = mutableSetOf<String>()
 
     // -------- Field update methods --------
 
     fun updateFullName(value: String) {
         fullName = value
-        // If already validated, validate again on change
-        if (isFullNameValidated) {
-            validateFullNameField()
-        }
+        validateFieldIfTouched("fullName")
     }
 
     fun updateEmail(value: String) {
         email = value
-        if (isEmailValidated) {
-            validateEmailField()
-        }
+        validateFieldIfTouched("email")
     }
 
     fun updatePhoneNumber(value: String) {
         phoneNumber = value
-        if (isPhoneValidated) {
-            validatePhoneField()
-        }
+        validateFieldIfTouched("phone")
     }
 
     fun updateSelectedCountry(country: CountryCode) {
         selectedCountry = country
-        if (isPhoneValidated) {
-            validatePhoneField()
-        }
+        validateFieldIfTouched("phone")
     }
 
     fun updateBio(value: String) {
         bio = value
-        if (isBioValidated) {
-            validateBioField()
-        }
+        validateFieldIfTouched("bio")
     }
 
     fun updateBirthDate(date: LocalDate?) {
         birthDate = date
-        validateBirthDateField()
+        validateField("birthDate")
     }
 
     fun updateEventDate(date: LocalDate?) {
         eventDate = date
-        validateEventDateField()
+        validateField("eventDate")
     }
 
     fun updateEventTime(time: LocalTime?) {
@@ -163,86 +117,58 @@ class FormValidationViewModel @Inject constructor(
 
     fun updateNumber(value: String) {
         numberValue = value
-        if (isNumberValidated) {
-            validateNumberField()
-        }
+        validateFieldIfTouched("number")
     }
 
     fun updatePassword(value: String) {
         password = value
-        if (isPasswordValidated) {
-            validatePasswordField()
-        }
-        // If password confirmation is already validated, we need to revalidate it
-        if (isPasswordConfirmationValidated) {
-            validatePasswordConfirmationField()
+        validateFieldIfTouched("password")
+
+        // If password confirmation is already touched, revalidate it
+        if (_touchedFields.contains("passwordConfirmation")) {
+            validateField("passwordConfirmation")
         }
     }
 
     fun updatePasswordConfirmation(value: String) {
         passwordConfirmation = value
-        if (isPasswordConfirmationValidated) {
-            validatePasswordConfirmationField()
+        validateFieldIfTouched("passwordConfirmation")
+    }
+
+    // -------- Field validation methods --------
+
+    fun markFieldAsTouched(fieldName: String) {
+        _touchedFields.add(fieldName)
+        validateField(fieldName)
+    }
+
+    private fun validateFieldIfTouched(fieldName: String) {
+        if (_touchedFields.contains(fieldName)) {
+            validateField(fieldName)
         }
     }
 
-    // -------- Validation trigger methods --------
+    fun validateField(fieldName: String) {
+        val errorMessage = when (fieldName) {
+            "fullName" -> ValidationUtils.validateName(fullName, "Full name").errorMessage
+            "email" -> ValidationUtils.validateEmail(email).errorMessage
+            "phone" -> ValidationUtils.validatePhoneNumber(phoneNumber, selectedCountry).errorMessage
+            "bio" -> ValidationUtils.validateBio(bio).errorMessage
+            "birthDate" -> validateBirthDate().errorMessage
+            "eventDate" -> validateEventDate().errorMessage
+            "number" -> ValidationUtils.validateNumber(numberValue, "Number").errorMessage
+            "password" -> ValidationUtils.validatePassword(password).errorMessage
+            "passwordConfirmation" -> ValidationUtils.validatePasswordConfirmation(password, passwordConfirmation).errorMessage
+            else -> null
+        }
 
-    fun validateFullNameField() {
-        isFullNameValidated = true
+        _fieldErrors.update { errors ->
+            errors.toMutableMap().apply { put(fieldName, errorMessage) }
+        }
     }
 
-    fun validateEmailField() {
-        isEmailValidated = true
-    }
-
-    fun validatePhoneField() {
-        isPhoneValidated = true
-    }
-
-    fun validateBioField() {
-        isBioValidated = true
-    }
-
-    fun validateBirthDateField() {
-        isBirthDateValidated = true
-    }
-
-    fun validateEventDateField() {
-        isEventDateValidated = true
-    }
-
-    fun validateNumberField() {
-        isNumberValidated = true
-    }
-
-    fun validatePasswordField() {
-        isPasswordValidated = true
-    }
-
-    fun validatePasswordConfirmationField() {
-        isPasswordConfirmationValidated = true
-    }
-
-    // -------- Validation methods --------
-
-    fun validateFullName(name: String): ValidationResult {
-        return ValidationUtils.validateName(name, "Full name")
-    }
-
-    fun validateEmail(value: String): ValidationResult {
-        return ValidationUtils.validateEmail(value)
-    }
-
-    fun validatePhone(value: String): ValidationResult {
-        return phoneNumberValidator.validate(value, selectedCountry)
-    }
-
-    fun validateBio(value: String): ValidationResult {
-        return ValidationUtils.validateBio(value)
-    }
-
-    fun validateBirthDate(): ValidationResult {
+    // Original validation methods (now used by validateField)
+    private fun validateBirthDate(): ValidationResult {
         return if (birthDate == null) {
             ValidationResult.Invalid("Date of birth is required")
         } else {
@@ -256,7 +182,7 @@ class FormValidationViewModel @Inject constructor(
         }
     }
 
-    fun validateEventDate(): ValidationResult {
+    private fun validateEventDate(): ValidationResult {
         return if (eventDate == null) {
             ValidationResult.Invalid("Event date is required")
         } else {
@@ -264,35 +190,24 @@ class FormValidationViewModel @Inject constructor(
         }
     }
 
-    fun validateNumber(value: String): ValidationResult {
-        return ValidationUtils.validateNumber(value, "Number")
-    }
-
-    fun validatePassword(value: String): ValidationResult {
-        return ValidationUtils.validatePassword(value)
-    }
-
-    fun validatePasswordConfirmation(password: String, confirmation: String): ValidationResult {
-        return ValidationUtils.validatePasswordConfirmation(password, confirmation)
-    }
-
     // -------- Form actions --------
 
+    fun validateAllFields(): Boolean {
+        // Validate all fields and mark all as touched
+        listOf(
+            "fullName", "email", "phone", "bio", "birthDate",
+            "eventDate", "number", "password", "passwordConfirmation"
+        ).forEach {
+            _touchedFields.add(it)
+            validateField(it)
+        }
+
+        return _fieldErrors.value.values.all { it == null }
+    }
+
     fun submitForm() {
-        if (!formValidator.validateAll()) {
+        if (!validateAllFields()) {
             _formSubmissionState.update { UiState.Error("Please fix the validation errors") }
-
-            // Mark all fields as validated
-            isFullNameValidated = true
-            isEmailValidated = true
-            isPhoneValidated = true
-            isBioValidated = true
-            isBirthDateValidated = true
-            isEventDateValidated = true
-            isNumberValidated = true
-            isPasswordValidated = true
-            isPasswordConfirmationValidated = true
-
             return
         }
 
@@ -329,33 +244,14 @@ class FormValidationViewModel @Inject constructor(
         passwordConfirmation = ""
 
         // Reset validation states
-        isFullNameValidated = false
-        isEmailValidated = false
-        isPhoneValidated = false
-        isBioValidated = false
-        isBirthDateValidated = false
-        isEventDateValidated = false
-        isNumberValidated = false
-        isPasswordValidated = false
-        isPasswordConfirmationValidated = false
-
-        formValidator.reset()
+        _touchedFields.clear()
+        _fieldErrors.update { emptyMap() }
         _formSubmissionState.update { UiState.Empty }
     }
 
     fun resetValidationFlags() {
-        isFullNameValidated = false
-        isEmailValidated = false
-        isPhoneValidated = false
-        isBioValidated = false
-        isBirthDateValidated = false
-        isEventDateValidated = false
-        isNumberValidated = false
-        isPasswordValidated = false
-        isPasswordConfirmationValidated = false
-
-        // Make sure the form validator knows we're not in validation mode
-        formValidator.reset()
+        // Clear all validation states
+        _touchedFields.clear()
+        _fieldErrors.update { emptyMap() }
     }
-
 }

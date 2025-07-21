@@ -10,17 +10,4 @@ sealed class ValidationResult {
 
     val isValid: Boolean get() = this is Valid
     val errorMessage: String? get() = if (this is Invalid) message else null
-
-    companion object {
-        /**
-         * Helper to validate non-blank fields
-         */
-        fun validateNonBlank(value: String, fieldName: String): ValidationResult {
-            return if (value.isBlank()) {
-                Invalid("$fieldName is required")
-            } else {
-                Valid
-            }
-        }
-    }
 }
