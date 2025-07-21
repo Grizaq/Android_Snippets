@@ -28,7 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.chirilglance.androidglancedna.core.ui.components.ClubConnectCard
+import com.chirilglance.androidglancedna.core.ui.components.DefaultCard
 import com.chirilglance.androidglancedna.core.ui.components.ClubConnectCardDefaults
 import com.chirilglance.androidglancedna.core.ui.components.buttons.PrimaryButton
 import com.chirilglance.androidglancedna.core.ui.components.buttons.SecondaryButton
@@ -61,7 +61,7 @@ fun CardsScreen() {
             )
 
             // Basic Card
-            ClubConnectCard(
+            DefaultCard(
                 titleContent = ClubConnectCardDefaults.Title("Basic Card"),
                 descriptionContent = ClubConnectCardDefaults.Description("This is a basic card with title and description."),
                 modifier = Modifier.fillMaxWidth()
@@ -77,7 +77,7 @@ fun CardsScreen() {
             )
 
             // Card with Icon
-            ClubConnectCard(
+            DefaultCard(
                 titleContent = ClubConnectCardDefaults.Title("Card with Icon"),
                 descriptionContent = ClubConnectCardDefaults.Description("This card includes an icon in the top left."),
                 leadingIcon = {
@@ -101,7 +101,7 @@ fun CardsScreen() {
 
             // Clickable Card
             var clickCount by remember { mutableIntStateOf(0) }
-            ClubConnectCard(
+            DefaultCard(
                 titleContent = ClubConnectCardDefaults.Title("Clickable Card"),
                 descriptionContent = {
                     Text(
@@ -125,7 +125,7 @@ fun CardsScreen() {
             )
 
             // Colored Card
-            ClubConnectCard(titleContent = {
+            DefaultCard(titleContent = {
                 Text(
                     text = "Colored Card",
                     style = MaterialTheme.typography.titleLarge,
@@ -152,7 +152,7 @@ fun CardsScreen() {
             )
 
             // Card with Horizontal Action Buttons
-            ClubConnectCard(
+            DefaultCard(
                 titleContent = ClubConnectCardDefaults.Title("Card with Actions"),
                 subtitleContent = ClubConnectCardDefaults.Subtitle("With Horizontal Buttons"),
                 descriptionContent = ClubConnectCardDefaults.Description("This card includes action buttons arranged horizontally."),
@@ -182,7 +182,7 @@ fun CardsScreen() {
             Spacer(modifier = Modifier.height(16.dp))
 
             // Card with Vertically Stacked Buttons
-            ClubConnectCard(
+            DefaultCard(
                 titleContent = ClubConnectCardDefaults.Title("Card with Stacked Buttons"),
                 descriptionContent = ClubConnectCardDefaults.Description("This card has buttons stacked vertically with padding."),
                 leadingIcon = {

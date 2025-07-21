@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.chirilglance.androidglancedna.core.domain.model.UiState
 import com.chirilglance.androidglancedna.core.ui.components.AutoErrorHandler
-import com.chirilglance.androidglancedna.core.ui.components.ClubConnectCard
+import com.chirilglance.androidglancedna.core.ui.components.DefaultCard
 import com.chirilglance.androidglancedna.core.ui.components.ClubConnectCardDefaults
 import com.chirilglance.androidglancedna.core.ui.components.buttons.PrimaryButton
 import com.chirilglance.androidglancedna.core.ui.components.buttons.SecondaryButton
@@ -128,7 +128,7 @@ fun SnackbarsScreen(
             )
 
             // Status display
-            ClubConnectCard(modifier = Modifier.fillMaxWidth(),
+            DefaultCard(modifier = Modifier.fillMaxWidth(),
                 titleContent = ClubConnectCardDefaults.Title("Demo State"),
                 descriptionContent = {
                     when (demoState) {

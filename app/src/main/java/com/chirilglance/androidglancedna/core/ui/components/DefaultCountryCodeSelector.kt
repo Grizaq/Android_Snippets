@@ -54,7 +54,7 @@ import com.chirilglance.androidglancedna.domain.utils.CountryCodeProvider
  * @param hideKeyboardOnSelect Whether to hide the keyboard when selecting a country
  */
 @Composable
-fun ClubConnectCountryCodeSelector(
+fun DefaultCountryCodeSelector(
     selectedCountry: CountryCode,
     onCountrySelected: (CountryCode) -> Unit,
     modifier: Modifier = Modifier,

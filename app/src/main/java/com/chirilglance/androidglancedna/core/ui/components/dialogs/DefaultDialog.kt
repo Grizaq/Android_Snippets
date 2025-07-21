@@ -48,7 +48,7 @@ import com.chirilglance.androidglancedna.core.ui.components.buttons.SecondaryBut
  * @param maxContentHeight Maximum height for the content area with scrolling enabled if exceeded
  */
 @Composable
-fun ClubConnectDialog(
+fun DefaultDialog(
     onDismissRequest: () -> Unit,
 
     // Content
@@ -168,14 +168,14 @@ fun ClubConnectDialog(
 }
 
 /**
- * A stateful version of [ClubConnectDialog] that manages its own visibility state.
+ * A stateful version of [DefaultDialog] that manages its own visibility state.
  *
  * @param showDialog Boolean state to control dialog visibility
  * @param onDialogDismiss Callback when the dialog is dismissed
- * @param other parameters Same as [ClubConnectDialog]
+ * @param other parameters Same as [DefaultDialog]
  */
 @Composable
-fun ClubConnectDialogStateful(
+fun DefaultDialogStateful(
     // State
     showDialog: Boolean,
     onDialogDismiss: () -> Unit,
@@ -206,7 +206,7 @@ fun ClubConnectDialogStateful(
     maxContentHeight: Dp = 300.dp,
 ) {
     if (showDialog) {
-        ClubConnectDialog(
+        DefaultDialog(
             onDismissRequest = onDialogDismiss,
             title = title,
             message = message,
@@ -230,7 +230,7 @@ fun ClubConnectDialogStateful(
 /**
  * Convenience object with default settings for common dialog types.
  */
-object ClubConnectDialogDefaults {
+object DefaultsDialog {
     /**
      * Creates a simple notification dialog with a single button.
      *
@@ -243,7 +243,7 @@ object ClubConnectDialogDefaults {
     fun NotificationDialog(
         title: String, message: String, buttonText: String = "OK", onDismiss: () -> Unit
     ) {
-        ClubConnectDialog(onDismissRequest = onDismiss,
+        DefaultDialog(onDismissRequest = onDismiss,
             title = title,
             message = message,
             confirmButtonText = buttonText,
@@ -270,7 +270,7 @@ object ClubConnectDialogDefaults {
         onConfirm: () -> Unit,
         onDismiss: () -> Unit
     ) {
-        ClubConnectDialog(
+        DefaultDialog(
             onDismissRequest = onDismiss,
             title = title,
             message = message,

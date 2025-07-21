@@ -3,7 +3,6 @@ package com.chirilglance.androidglancedna.presentation.examples.auth.phoneverifi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -23,17 +21,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.chirilglance.androidglancedna.core.domain.model.UiState
-import com.chirilglance.androidglancedna.core.ui.components.ClubConnectCard
+import com.chirilglance.androidglancedna.core.ui.components.DefaultCard
 import com.chirilglance.androidglancedna.core.ui.components.ClubConnectCardDefaults
-import com.chirilglance.androidglancedna.core.ui.components.ClubConnectCountryCodeSelector
-import com.chirilglance.androidglancedna.core.ui.components.ClubConnectPhoneField
+import com.chirilglance.androidglancedna.presentation.components.form.ValidatedPhoneField
 
 @Composable
 fun PhoneVerificationScreen(
@@ -44,12 +40,9 @@ fun PhoneVerificationScreen(
     val scrollState = rememberScrollState()
 
     val uiState by viewModel.uiState.collectAsState()
-    val phoneNumber by viewModel.phoneNumber.collectAsState()
-    val selectedCountry by viewModel.selectedCountry.collectAsState()
-    val phoneNumberError by viewModel.phoneNumberError.collectAsState()
 
     // Force recomposition when validation state changes
-    val canVerify = remember(phoneNumber, phoneNumberError, uiState) {
+    val canVerify = remember(viewModel.phoneNumber, viewModel.selectedCountry, uiState) {
         viewModel.canVerify() && uiState !is UiState.Loading
     }
 
@@ -60,9 +53,7 @@ fun PhoneVerificationScreen(
                 val formattedNumber = (uiState as UiState.Success<String>).data
                 onVerificationRequested(formattedNumber)
             }
-
-            else -> { /* No action needed */
-            }
+            else -> { /* No action needed */ }
         }
     }
 
@@ -77,7 +68,8 @@ fun PhoneVerificationScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.Center
         ) {
-            ClubConnectCard(modifier = Modifier.fillMaxWidth(),
+            DefaultCard(
+                modifier = Modifier.fillMaxWidth(),
                 titleContent = ClubConnectCardDefaults.Title("Let's get you verified"),
                 subtitleContent = ClubConnectCardDefaults.Subtitle("Welcome to Android Glance DNA"),
                 descriptionContent = ClubConnectCardDefaults.Description(
@@ -85,59 +77,30 @@ fun PhoneVerificationScreen(
                 ),
                 actions = {
                     Column {
-                        Column {
-                            // Phone input row
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 16.dp)
-                            ) {
-                                // Country code selector using the separate component
-                                ClubConnectCountryCodeSelector(
-                                    selectedCountry = selectedCountry,
-                                    onCountrySelected = viewModel::updateSelectedCountry,
-                                    modifier = Modifier.weight(0.35f)
-                                )
+                        // Validated phone field with country code selector
+                        ValidatedPhoneField(
+                            phoneNumber = viewModel.phoneNumber,
+                            onPhoneNumberChange = { newValue ->
+                                viewModel.updatePhoneNumber(newValue)
 
-                                Spacer(modifier = Modifier.width(8.dp))
-
-                                // Phone number input using the separate component
-                                ClubConnectPhoneField(
-                                    value = phoneNumber,
-                                    onValueChange = { newValue ->
-                                        viewModel.updatePhoneNumber(newValue)
-
-                                        // Check if we need to hide the keyboard after each digit is entered
-                                        if (viewModel.isPhoneNumberComplete()) {
-                                            keyboardController?.hide()
-                                        }
-                                    },
-                                    isError = phoneNumberError != null,
-                                    onDone = {
-                                        if (viewModel.canVerify()) {
-                                            viewModel.verifyPhoneNumber { formattedNumber ->
-                                                onVerificationRequested(formattedNumber)
-                                            }
-                                        }
-                                    },
-                                    modifier = Modifier.weight(0.7f)
-                                )
-                            }
-
-                            // Error message centered below both inputs
-                            phoneNumberError?.let { error ->
-                                Text(
-                                    text = error,
-                                    color = MaterialTheme.colorScheme.error,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(top = 8.dp)
-                                )
-                            }
-                        }
+                                // Check if we need to hide the keyboard after each digit
+                                if (viewModel.isPhoneNumberComplete()) {
+                                    keyboardController?.hide()
+                                }
+                            },
+                            selectedCountry = viewModel.selectedCountry,
+                            onCountrySelected = viewModel::updateSelectedCountry,
+                            phoneNumberValidator = viewModel.phoneNumberValidator,
+                            externalValidationTriggered = viewModel.formValidator.isValidated.value,
+                            onDone = {
+                                if (viewModel.canVerify()) {
+                                    viewModel.verifyPhoneNumber { formattedNumber ->
+                                        onVerificationRequested(formattedNumber)
+                                    }
+                                }
+                            },
+                            modifier = Modifier.padding(top = 16.dp)
+                        )
 
                         // API error message
                         if (uiState is UiState.Error) {
@@ -152,7 +115,8 @@ fun PhoneVerificationScreen(
                             )
                         }
                     }
-                })
+                }
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
