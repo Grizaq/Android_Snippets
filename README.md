@@ -51,6 +51,9 @@ Type-safe navigation using sealed classes with proper back stack handling and de
 ### [State Management](app/src/main/java/com/chirilglance/androidglancedna/core/domain/model/README.md)
 Consistent state management with UiState pattern for predictable UI updates and error handling.
 
+### [Extensions](app/src/main/java/com.chirilglance.androidglancedna.core.extension/README.md)
+Consistent state management with UiState pattern for predictable UI updates and error handling.
+
 ## General Project Structure
 
 ```
