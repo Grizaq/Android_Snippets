@@ -342,4 +342,20 @@ class FormValidationViewModel @Inject constructor(
         formValidator.reset()
         _formSubmissionState.update { UiState.Empty }
     }
+
+    fun resetValidationFlags() {
+        isFullNameValidated = false
+        isEmailValidated = false
+        isPhoneValidated = false
+        isBioValidated = false
+        isBirthDateValidated = false
+        isEventDateValidated = false
+        isNumberValidated = false
+        isPasswordValidated = false
+        isPasswordConfirmationValidated = false
+
+        // Make sure the form validator knows we're not in validation mode
+        formValidator.reset()
+    }
+
 }

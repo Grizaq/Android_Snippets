@@ -18,6 +18,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
@@ -26,8 +30,8 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.chirilglance.androidglancedna.presentation.ui.theme.ClubConnectGreen
 import com.chirilglance.androidglancedna.presentation.ui.theme.ErrorRed
 import com.chirilglance.androidglancedna.presentation.ui.theme.HintColor
 import com.chirilglance.androidglancedna.presentation.ui.theme.Navy
@@ -161,8 +165,6 @@ fun DefaultTextField(
  * @param onDone Callback when the keyboard's action button is pressed
  * @param labelWeight Weight of the label in the row (0-1)
  * @param fieldWeight Weight of the field in the row (0-1)
- * @param containerColor Background color of the card
- * @param elevation Shadow depth of the card
  * @param contentPadding Padding inside the card
  * @param singleLine Whether to restrict input to a single line
  * @param isFocused Whether the field is currently focused
@@ -188,22 +190,21 @@ fun LabeledTextField(
     isFocused: Boolean = false,
     onFocusChanged: ((Boolean) -> Unit)? = null
 ) {
+    var internalFocusState by remember { mutableStateOf(isFocused) }
     val focusManager = LocalFocusManager.current
 
     Card(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isFocused)
-                MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-            else MaterialTheme.colorScheme.surface
+            containerColor = MaterialTheme.colorScheme.surface
         ),
         modifier = modifier
             .fillMaxWidth()
             .then(
-                if (isFocused) {
+                if (internalFocusState) {
                     Modifier.border(
                         width = 1.dp,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = ClubConnectGreen,
                         shape = RoundedCornerShape(8.dp)
                     )
                 } else {
@@ -211,74 +212,73 @@ fun LabeledTextField(
                 }
             )
     ) {
-        Column {
-            // Input field row
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
+        // Input field row
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(contentPadding)
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(contentPadding)
-            ) {
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier
-                        .weight(labelWeight)
-                        .padding(end = 8.dp)
-                )
+                    .weight(labelWeight)
+                    .padding(end = 8.dp)
+            )
 
-                TextField(
-                    value = value,
-                    onValueChange = onValueChange,
-                    modifier = Modifier
-                        .weight(fieldWeight)
-                        .onFocusChanged { focusState ->
-                            onFocusChanged?.invoke(focusState.isFocused)
-                        },
-                    placeholder = {
-                        Text(
-                            text = hint,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
-                        )
+            TextField(
+                value = value,
+                onValueChange = onValueChange,
+                modifier = Modifier
+                    .weight(fieldWeight)
+                    .onFocusChanged { focusState ->
+                        internalFocusState = focusState.isFocused
+                        onFocusChanged?.invoke(focusState.isFocused)
                     },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = keyboardType,
-                        imeAction = imeAction
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            focusManager.clearFocus()
-                            onDone?.invoke()
-                        }
-                    ),
-                    isError = errorMessage != null,
-                    singleLine = singleLine,
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        errorContainerColor = Color.Transparent,
-                        disabledContainerColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        errorIndicatorColor = ErrorRed,
-                        focusedPlaceholderColor = HintColor,
-                        unfocusedPlaceholderColor = HintColor
-                    ),
-                    maxLines = maxLines,
-                    visualTransformation = visualTransformation
-                )
-            }
+                placeholder = {
+                    Text(
+                        text = hint,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                    )
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = keyboardType,
+                    imeAction = imeAction
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        focusManager.clearFocus()
+                        onDone?.invoke()
+                    }
+                ),
+                isError = errorMessage != null,
+                singleLine = singleLine,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    errorContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    errorIndicatorColor = ErrorRed,
+                    focusedPlaceholderColor = HintColor,
+                    unfocusedPlaceholderColor = HintColor
+                ),
+                maxLines = maxLines,
+                visualTransformation = visualTransformation
+            )
+        }
 
-            // Error message with consistent padding
-            if (errorMessage != null) {
-                Text(
-                    text = errorMessage,
-                    color = ErrorRed,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(start = 16.dp, bottom = 12.dp, end = 16.dp)
-                )
-            }
+        // Error message with consistent padding
+        if (errorMessage != null) {
+            Text(
+                text = errorMessage,
+                color = ErrorRed,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(start = 16.dp, bottom = 12.dp, end = 16.dp)
+            )
         }
     }
 }
