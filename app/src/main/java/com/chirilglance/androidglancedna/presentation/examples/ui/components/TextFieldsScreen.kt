@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.chirilglance.androidglancedna.core.ui.components.DefaultDropdownField
 import com.chirilglance.androidglancedna.core.ui.components.DefaultTextField
 import com.chirilglance.androidglancedna.core.ui.components.LabeledTextField
 import com.chirilglance.androidglancedna.core.ui.components.NumberTextField
@@ -89,6 +90,65 @@ fun TextFieldsScreen() {
                 hint = "Enter your email",
                 errorMessage = emailError,
                 keyboardType = KeyboardType.Email,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        // Dropdown Fields
+        ComponentSection(title = "Dropdown Fields") {
+            Text(
+                text = "Dropdown fields allow users to select a value from a predefined list of options.",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            // Basic Dropdown
+            val countryOptions = listOf("United States", "Canada", "United Kingdom", "Australia", "Germany", "France", "Japan", "Brazil", "India", "China")
+            var selectedCountry by remember { mutableStateOf("") }
+            DefaultDropdownField(
+                value = selectedCountry,
+                onValueChange = { selectedCountry = it },
+                label = "Country",
+                options = countryOptions,
+                placeholder = "Select country",
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Dropdown with Validation
+            val roleOptions = listOf("User", "Moderator", "Administrator", "Guest")
+            var selectedRole by remember { mutableStateOf("") }
+            var roleError by remember { mutableStateOf<String?>(null) }
+            DefaultDropdownField(
+                value = selectedRole,
+                onValueChange = {
+                    selectedRole = it
+                    roleError = if (it == "Guest") {
+                        "Guest accounts have limited access"
+                    } else {
+                        null
+                    }
+                },
+                label = "Role",
+                options = roleOptions,
+                placeholder = "Select role",
+                errorMessage = roleError,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Colored Dropdown
+            val priorityOptions = listOf("Low", "Medium", "High", "Critical")
+            var selectedPriority by remember { mutableStateOf("") }
+            DefaultDropdownField(
+                value = selectedPriority,
+                onValueChange = { selectedPriority = it },
+                label = "Priority",
+                options = priorityOptions,
+                placeholder = "Select priority",
+                useAccentColor = true,
                 modifier = Modifier.fillMaxWidth()
             )
         }
