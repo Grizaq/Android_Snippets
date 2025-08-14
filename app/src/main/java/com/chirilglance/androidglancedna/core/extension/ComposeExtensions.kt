@@ -12,7 +12,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
@@ -21,7 +20,7 @@ import androidx.compose.ui.unit.TextUnit
 /**
  * Create a debounced click modifier to prevent double clicks.
  * This non-composable version uses a static timestamp but is less reliable for
- * multiple buttons in the same UI.
+ * multiple buttons in the same UI, requires care when using multiple on the same screen
  *
  * Example:
  * ```
@@ -35,8 +34,7 @@ import androidx.compose.ui.unit.TextUnit
  * @param onClick The click handler
  */
 fun Modifier.simpleDebounceClickable(
-    debounceTime: Long = 300L,
-    onClick: () -> Unit
+    debounceTime: Long = 300L, onClick: () -> Unit
 ): Modifier {
     // Use a companion object to hold the timestamp statically
     // Note: This is a simple approach that works for basic cases
@@ -72,8 +70,7 @@ private object DebounceInfo {
  * @param onClick The click handler
  */
 fun Modifier.simpleNoRippleClickable(onClick: () -> Unit): Modifier = clickable(
-    interactionSource = MutableInteractionSource(),
-    indication = null
+    interactionSource = MutableInteractionSource(), indication = null
 ) {
     onClick()
 }
@@ -84,8 +81,7 @@ fun Modifier.simpleNoRippleClickable(onClick: () -> Unit): Modifier = clickable(
  */
 @Composable
 fun Modifier.debouncedClick(
-    debounceTime: Long = 300L,
-    onClick: () -> Unit
+    debounceTime: Long = 300L, onClick: () -> Unit
 ): Modifier {
     var lastClickTime by remember { mutableLongStateOf(0L) }
 
@@ -104,10 +100,7 @@ fun Modifier.debouncedClick(
  */
 @Composable
 fun Modifier.noRippleClickable(
-    enabled: Boolean = true,
-    onClickLabel: String? = null,
-    role: Role? = null,
-    onClick: () -> Unit
+    enabled: Boolean = true, onClickLabel: String? = null, role: Role? = null, onClick: () -> Unit
 ): Modifier = this.then(
     if (enabled) {
         Modifier.clickable(
@@ -139,8 +132,7 @@ fun Modifier.noRippleClickable(
  * @param modifier The modifier to apply if the condition is true
  */
 fun Modifier.conditional(
-    condition: Boolean,
-    modifier: Modifier.() -> Modifier
+    condition: Boolean, modifier: Modifier.() -> Modifier
 ): Modifier {
     return if (condition) {
         this.then(modifier(Modifier))
@@ -166,9 +158,7 @@ fun Modifier.conditional(
  * @param ifFalse The modifier to apply if the condition is false (optional)
  */
 fun Modifier.applyIf(
-    condition: Boolean,
-    ifTrue: Modifier.() -> Modifier,
-    ifFalse: (Modifier.() -> Modifier)? = null
+    condition: Boolean, ifTrue: Modifier.() -> Modifier, ifFalse: (Modifier.() -> Modifier)? = null
 ): Modifier {
     return if (condition) {
         then(ifTrue(Modifier))
@@ -197,8 +187,7 @@ fun Modifier.visible(visible: Boolean): Modifier {
  * @param onFocusChanged Callback for when focus changes
  */
 fun Modifier.handleFocus(
-    focusRequester: FocusRequester,
-    onFocusChanged: ((Boolean) -> Unit)? = null
+    focusRequester: FocusRequester, onFocusChanged: ((Boolean) -> Unit)? = null
 ): Modifier = this
     .focusRequester(focusRequester)
     .onFocusChanged {
