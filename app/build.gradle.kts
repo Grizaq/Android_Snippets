@@ -115,6 +115,13 @@ dependencies {
     // Browser handling
     implementation(libs.androidx.browser)
 
+    // Firebase Auth & Firestore
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+
+    // Google Sign-In
+    implementation(libs.play.services.auth)
+
     // Optional dependencies
     // implementation(libs.apollo.runtime)
     implementation(libs.hiltNavigationCompose)

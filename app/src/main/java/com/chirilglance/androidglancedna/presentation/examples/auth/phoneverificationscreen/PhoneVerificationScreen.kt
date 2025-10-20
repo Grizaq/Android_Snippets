@@ -1,8 +1,11 @@
 package com.chirilglance.androidglancedna.presentation.examples.auth.phoneverificationscreen
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +24,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.style.TextAlign
@@ -29,27 +34,43 @@ import com.chirilglance.androidglancedna.core.domain.model.UiState
 import com.chirilglance.androidglancedna.core.ui.components.ClubConnectCardDefaults
 import com.chirilglance.androidglancedna.core.ui.components.DefaultCard
 import com.chirilglance.androidglancedna.presentation.components.form.ValidatedPhoneField
+import com.chirilglance.androidglancedna.presentation.examples.auth.google.GoogleSignInButton
+import com.chirilglance.androidglancedna.presentation.examples.auth.google.GoogleSignInState
+import com.chirilglance.androidglancedna.presentation.examples.auth.google.GoogleSignInViewModel
 
 @Composable
 fun PhoneVerificationScreen(
     onVerificationRequested: (String) -> Unit,
-    viewModel: PhoneVerificationViewModel = hiltViewModel()
+    onGoogleSignInSuccess: () -> Unit,
+    phoneViewModel: PhoneVerificationViewModel = hiltViewModel(),
+    googleViewModel: GoogleSignInViewModel = hiltViewModel()
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val scrollState = rememberScrollState()
 
-    val uiState by viewModel.uiState.collectAsState()
+    val phoneUiState by phoneViewModel.uiState.collectAsState()
+    val googleSignInState by googleViewModel.signInState.collectAsState()
 
     // Force recomposition when validation state changes
-    val canVerify = remember(viewModel.phoneNumber, viewModel.selectedCountry, uiState) {
-        viewModel.canVerify() && uiState !is UiState.Loading
+    val canVerify = remember(phoneViewModel.phoneNumber, phoneViewModel.selectedCountry, phoneUiState) {
+        phoneViewModel.canVerify() && phoneUiState !is UiState.Loading
     }
 
-    // Handle UI state changes
-    LaunchedEffect(uiState) {
-        when (uiState) {
+    // Activity result launcher for Google Sign-In
+    val googleSignInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        googleViewModel.handleSignInResult(result.data) { user ->
+            // Sign in successful, navigate to next screen
+            onGoogleSignInSuccess()
+        }
+    }
+
+    // Handle phone verification UI state changes
+    LaunchedEffect(phoneUiState) {
+        when (phoneUiState) {
             is UiState.Success -> {
-                val formattedNumber = (uiState as UiState.Success<String>).data
+                val formattedNumber = (phoneUiState as UiState.Success<String>).data
                 onVerificationRequested(formattedNumber)
             }
             else -> { /* No action needed */ }
@@ -78,22 +99,22 @@ fun PhoneVerificationScreen(
                     Column {
                         // Validated phone field with country code selector
                         ValidatedPhoneField(
-                            phoneNumber = viewModel.phoneNumber,
+                            phoneNumber = phoneViewModel.phoneNumber,
                             onPhoneNumberChange = { newValue ->
-                                viewModel.updatePhoneNumber(newValue)
+                                phoneViewModel.updatePhoneNumber(newValue)
 
                                 // Check if we need to hide the keyboard after each digit
-                                if (viewModel.isPhoneNumberComplete()) {
+                                if (phoneViewModel.isPhoneNumberComplete()) {
                                     keyboardController?.hide()
                                 }
                             },
-                            selectedCountry = viewModel.selectedCountry,
-                            onCountrySelected = viewModel::updateSelectedCountry,
-                            phoneNumberValidator = viewModel.phoneNumberValidator,
-                            externalValidationTriggered = viewModel.formValidator.isValidated.value,
+                            selectedCountry = phoneViewModel.selectedCountry,
+                            onCountrySelected = phoneViewModel::updateSelectedCountry,
+                            phoneNumberValidator = phoneViewModel.phoneNumberValidator,
+                            externalValidationTriggered = phoneViewModel.formValidator.isValidated.value,
                             onDone = {
-                                if (viewModel.canVerify()) {
-                                    viewModel.verifyPhoneNumber { formattedNumber ->
+                                if (phoneViewModel.canVerify()) {
+                                    phoneViewModel.verifyPhoneNumber { formattedNumber ->
                                         onVerificationRequested(formattedNumber)
                                     }
                                 }
@@ -101,10 +122,10 @@ fun PhoneVerificationScreen(
                             modifier = Modifier.padding(top = 16.dp)
                         )
 
-                        // API error message
-                        if (uiState is UiState.Error) {
+                        // Phone API error message
+                        if (phoneUiState is UiState.Error) {
                             Text(
-                                text = (uiState as UiState.Error).message,
+                                text = (phoneUiState as UiState.Error).message,
                                 color = MaterialTheme.colorScheme.error,
                                 style = MaterialTheme.typography.bodyMedium,
                                 textAlign = TextAlign.Center,
@@ -119,20 +140,20 @@ fun PhoneVerificationScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Bottom button with proper padding
+            // Phone verification button
             Button(
                 onClick = {
                     keyboardController?.hide()
-                    viewModel.verifyPhoneNumber { formattedNumber ->
+                    phoneViewModel.verifyPhoneNumber { formattedNumber ->
                         onVerificationRequested(formattedNumber)
                     }
                 },
                 enabled = canVerify,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(horizontal = 16.dp)
             ) {
-                if (uiState is UiState.Loading) {
+                if (phoneUiState is UiState.Loading) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(24.dp),
                         color = MaterialTheme.colorScheme.onPrimary,
@@ -142,6 +163,37 @@ fun PhoneVerificationScreen(
                     Text(text = "Get my code")
                 }
             }
+
+            // Divider with "OR"
+            Spacer(modifier = Modifier.height(24.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                HorizontalDivider(modifier = Modifier.weight(1f))
+                Text(
+                    text = "OR",
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                HorizontalDivider(modifier = Modifier.weight(1f))
+            }
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Google Sign-In button
+            GoogleSignInButton(
+                onClick = {
+                    // Launch Google Sign-In intent directly
+                    val signInIntent = googleViewModel.getSignInIntent()
+                    googleSignInLauncher.launch(signInIntent)
+                },
+                modifier = Modifier.padding(horizontal = 16.dp),
+                isLoading = googleSignInState is GoogleSignInState.Loading,
+                enabled = googleSignInState !is GoogleSignInState.Loading
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }

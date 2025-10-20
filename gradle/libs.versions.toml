@@ -26,6 +26,7 @@ placesVersion = "3.3.0"
 kizitonwose-calendar = "2.6.0"
 kotlinSerialization = "1.6.2"
 browser = "1.6.0"
+playServicesAuth = "21.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -77,6 +78,11 @@ coil-video = { group = "io.coil-kt", name = "coil-video", version.ref = "coilVer
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
+# Firebase Auth & Firestore
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
+# Google Sign-In
+play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
 
 # Maps autocomplete
 google-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "googleMapsVersion" }

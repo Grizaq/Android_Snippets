@@ -29,9 +29,17 @@ fun AuthenticationScreen(
         navController = authNavController, startDestination = Screen.PhoneVerification.route
     ) {
         composable(Screen.PhoneVerification.route) {
-            PhoneVerificationScreen(onVerificationRequested = { phoneNumber ->
-                authNavController.navigate(Screen.OtpVerification.createRoute(phoneNumber))
-            })
+            PhoneVerificationScreen(
+                onVerificationRequested = { phoneNumber ->
+                    authNavController.navigate(Screen.OtpVerification.createRoute(phoneNumber))
+                },
+                onGoogleSignInSuccess = {
+                    // User signed in with Google - go straight to welcome or home
+                    authNavController.navigate(Screen.Welcome.route) {
+                        popUpTo(Screen.PhoneVerification.route) { inclusive = true }
+                    }
+                }
+            )
         }
 
         composable(route = Screen.OtpVerification.route,
