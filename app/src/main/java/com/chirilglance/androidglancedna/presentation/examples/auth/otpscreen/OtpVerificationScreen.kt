@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -25,8 +24,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.chirilglance.androidglancedna.core.domain.model.UiState
-import com.chirilglance.androidglancedna.core.ui.components.DefaultCard
 import com.chirilglance.androidglancedna.core.ui.components.ClubConnectCardDefaults
+import com.chirilglance.androidglancedna.core.ui.components.DefaultCard
 import com.chirilglance.androidglancedna.core.ui.components.DefaultOtpField
 import com.chirilglance.androidglancedna.core.ui.components.buttons.PrimaryButton
 
@@ -127,7 +126,6 @@ fun OtpVerificationScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
-                    .imePadding() // This is the key - ensures buttons stay above keyboard
             ) {
                 // In OtpVerificationScreen.kt
                 PrimaryButton(text = "Verify",

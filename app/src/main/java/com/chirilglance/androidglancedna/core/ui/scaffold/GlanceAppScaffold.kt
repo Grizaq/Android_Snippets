@@ -1,7 +1,10 @@
 package com.chirilglance.androidglancedna.core.ui.scaffold
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
@@ -44,6 +47,7 @@ fun GlanceAppScaffold(
 
         Scaffold(
             modifier = modifier.fillMaxSize(),
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
             snackbarHost = {
                 GlanceSnackbarHost(hostState = snackbarHostState)
             },
@@ -69,6 +73,8 @@ fun GlanceAppScaffold(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding)
+                    .imePadding()
             ) {
                 content()
             }
