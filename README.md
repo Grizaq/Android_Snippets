@@ -1,4 +1,4 @@
-# AndroidGlanceDNA
+# AndroidGlanceDNA init
 
 AndroidGlanceDNA is a collection of reusable components, utilities, and best practices for modern Android development using Jetpack Compose. Instead of a rigid library, this project provides a reference implementation that you can easily adapt to your specific needs.
 
