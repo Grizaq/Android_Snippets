@@ -34,22 +34,27 @@ This is not a library to be imported, but rather a collection of examples to lea
 
 ### [UI Components](app/src/main/java/com/chirilglance/androidglancedna/core/ui/README.md)
 Reusable UI components including buttons, text fields, cards, and snackbars with consistent styling and support for loading states.
+
 <img src="UI_dialog_screen.png" width="200">
 
 ### [Role-Based Profile Management System](app/src/main/java/com/chirilglance/androidglancedna/presentation/examples/profile/README.md)
 Reusable UI components including buttons, text fields, cards, and snackbars with consistent styling and support for loading states.
+
 <img src="Profile_management_screen.png" width="200">
 
 ### [Error Handling](app/src/main/java/com/chirilglance/androidglancedna/core/domain/error/README.md)
 Automatic error handling system that displays network and validation errors as snackbars without boilerplate code.
+
 <img src="UI_snackbar_screen.png" width="200">
 
 ### [Authentication](app/src/main/java/com/chirilglance/androidglancedna/presentation/examples/auth/README.md)
 Complete, commonly used, phone verification and OTP flow with timer and resend functionality.
+
 <img src="Authentication_screen.png" width="200">
 
 ### [Form Validation](app/src/main/java/com/chirilglance/androidglancedna/core/validation/README.md)
 Real-time input validation with immediate feedback.
+
 <img src="Validation_screen.png" width="200"><img src="Validation_screen_dark.png" width="200">
 
 ### [Navigation](app/src/main/java/com/chirilglance/androidglancedna/presentation/navigation/README.md)
