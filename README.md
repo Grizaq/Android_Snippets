@@ -14,8 +14,7 @@ This project showcases production-ready implementations of common Android app fe
 - **Form Validation**: Input validation with live feedback
 - **Location Services**: Places API integration
 
-![Home_screen.png](Home_screen.png)
-![Home_screen_dark.png](Home_screen_dark.png)
+<img src="Home_screen.png" width="200"> <img src="Home_screen_dark.png" width="200">
 
 ## Getting Started
 
@@ -35,24 +34,23 @@ This is not a library to be imported, but rather a collection of examples to lea
 
 ### [UI Components](app/src/main/java/com/chirilglance/androidglancedna/core/ui/README.md)
 Reusable UI components including buttons, text fields, cards, and snackbars with consistent styling and support for loading states.
-![UI_dialog_screen.png](UI_dialog_screen.png)
+<img src="UI_dialog_screen.png" width="200">
 
 ### [Role-Based Profile Management System](app/src/main/java/com/chirilglance/androidglancedna/presentation/examples/profile/README.md)
 Reusable UI components including buttons, text fields, cards, and snackbars with consistent styling and support for loading states.
-![Profile_management_screen.png](Profile_management_screen.png)
+<img src="Profile_management_screen.png" width="200">
 
 ### [Error Handling](app/src/main/java/com/chirilglance/androidglancedna/core/domain/error/README.md)
 Automatic error handling system that displays network and validation errors as snackbars without boilerplate code.
-![UI_snackbar_screen.png](UI_snackbar_screen.png)
+<img src="UI_snackbar_screen.png" width="200">
 
 ### [Authentication](app/src/main/java/com/chirilglance/androidglancedna/presentation/examples/auth/README.md)
 Complete, commonly used, phone verification and OTP flow with timer and resend functionality.
-![Authentication_screen.png](Authentication_screen.png)
+<img src="Authentication_screen.png" width="200">
 
 ### [Form Validation](app/src/main/java/com/chirilglance/androidglancedna/core/validation/README.md)
 Real-time input validation with immediate feedback.
-![Validation_screen.png](Validation_screen.png)
-![Validation_screen_dark.png](Validation_screen_dark.png)
+<img src="Validation_screen.png" width="200"><img src="Validation_screen_dark.png" width="200">
 
 ### [Navigation](app/src/main/java/com/chirilglance/androidglancedna/presentation/navigation/README.md)
 Type-safe navigation using sealed classes with proper back stack handling and deep link support.
