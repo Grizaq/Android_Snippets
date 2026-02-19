@@ -20,6 +20,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -28,17 +29,22 @@ import com.chirilglance.androidglancedna.core.ui.components.ClubConnectCardDefau
 import com.chirilglance.androidglancedna.core.ui.components.DefaultCard
 import com.chirilglance.androidglancedna.core.ui.components.DefaultOtpField
 import com.chirilglance.androidglancedna.core.ui.components.buttons.PrimaryButton
+import com.google.firebase.auth.PhoneAuthProvider
 
 @Composable
 fun OtpVerificationScreen(
     phoneNumber: String,
+    verificationId: String,
+    resendToken: PhoneAuthProvider.ForceResendingToken? = null,
     onVerificationComplete: () -> Unit,
     onBackPressed: () -> Unit,
     viewModel: OtpVerificationViewModel = hiltViewModel()
 ) {
-    // Initialize the viewModel with the phone number
-    LaunchedEffect(phoneNumber) {
-        viewModel.initPhoneNumber(phoneNumber)
+    val context = LocalContext.current
+
+    // Initialize the viewModel with verification data
+    LaunchedEffect(phoneNumber, verificationId) {
+        viewModel.initVerification(phoneNumber, verificationId, resendToken)
     }
 
     val scrollState = rememberScrollState()
@@ -57,20 +63,21 @@ fun OtpVerificationScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.Center
         ) {
-            DefaultCard(modifier = Modifier.fillMaxWidth(),
+            DefaultCard(
+                modifier = Modifier.fillMaxWidth(),
                 titleContent = ClubConnectCardDefaults.Title("Verify your account"),
                 subtitleContent = ClubConnectCardDefaults.Subtitle("SMS Verification"),
                 descriptionContent = ClubConnectCardDefaults.Description(
-                    "Enter the code we have sent to your mobile device and enter it below to link your account."
+                    "Enter the 6-digit code we sent to your mobile device"
                 ),
                 actions = {
                     Column {
-                        // OTP input field using the new component
+                        // OTP input field - 6 digits for Firebase
                         DefaultOtpField(
                             otpDigits = otpDigits,
                             onDigitChange = viewModel::updateOtpDigit,
                             onComplete = {
-                                // Auto-verify when all digits are entered
+                                // Auto-verify when all 6 digits are entered
                                 if (otpDigits.all { it.isNotEmpty() }) {
                                     viewModel.verifyOtp {
                                         onVerificationComplete()
@@ -108,7 +115,9 @@ fun OtpVerificationScreen(
                                 )
                             } else {
                                 TextButton(
-                                    onClick = { viewModel.resendOtp() },
+                                    onClick = {
+                                        viewModel.resendOtp(context as android.app.Activity)
+                                    },
                                     enabled = uiState !is UiState.Loading
                                 ) {
                                     Text("Resend code")
@@ -116,10 +125,10 @@ fun OtpVerificationScreen(
                             }
                         }
                     }
-                })
+                }
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
-
 
             // Bottom buttons with proper padding
             Column(
@@ -127,8 +136,8 @@ fun OtpVerificationScreen(
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                // In OtpVerificationScreen.kt
-                PrimaryButton(text = "Verify",
+                PrimaryButton(
+                    text = "Verify",
                     onClick = {
                         viewModel.verifyOtp {
                             onVerificationComplete()

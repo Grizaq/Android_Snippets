@@ -10,9 +10,9 @@ sealed class Screen(val route: String) {
 
     // Authentication screens
     data object PhoneVerification : Screen("phone_verification")
-    data object OtpVerification : Screen("otp_verification/{phoneNumber}") {
+    data object OtpVerification : Screen("otp_verification/{phoneNumber}/{verificationId}") {
         override fun createRoute(vararg params: String): String =
-            "otp_verification/${params[0]}"
+            "otp_verification/${params[0]}/${params[1]}"
     }
     data object Welcome : Screen("welcome")
 
@@ -21,6 +21,7 @@ sealed class Screen(val route: String) {
     data object UiComponents : Screen("ui_components")
     data object FormValidation : Screen("form_validation")
     data object Authentication : Screen("authentication")
+    data object EmailSignIn : Screen("email_sign_in")
     data object LocationServices : Screen("location_services")
     data object StateManagement : Screen("state_management")
 
