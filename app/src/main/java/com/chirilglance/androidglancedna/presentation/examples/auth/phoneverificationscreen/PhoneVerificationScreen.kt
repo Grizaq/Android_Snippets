@@ -19,6 +19,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -26,10 +27,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.chirilglance.androidglancedna.core.domain.model.UiState
 import com.chirilglance.androidglancedna.core.ui.components.ClubConnectCardDefaults
 import com.chirilglance.androidglancedna.core.ui.components.DefaultCard
@@ -37,16 +40,21 @@ import com.chirilglance.androidglancedna.presentation.components.form.ValidatedP
 import com.chirilglance.androidglancedna.presentation.examples.auth.google.GoogleSignInButton
 import com.chirilglance.androidglancedna.presentation.examples.auth.google.GoogleSignInState
 import com.chirilglance.androidglancedna.presentation.examples.auth.google.GoogleSignInViewModel
+import com.chirilglance.androidglancedna.presentation.navigation.Screen
+import com.chirilglance.androidglancedna.presentation.ui.theme.AccentGreen
+import com.chirilglance.androidglancedna.presentation.ui.theme.Navy
 
 @Composable
 fun PhoneVerificationScreen(
-    onVerificationRequested: (String) -> Unit,
+    navController: NavHostController,
+    onVerificationRequested: (String, String) -> Unit, // phoneNumber, verificationId
     onGoogleSignInSuccess: () -> Unit,
     phoneViewModel: PhoneVerificationViewModel = hiltViewModel(),
     googleViewModel: GoogleSignInViewModel = hiltViewModel()
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
 
     val phoneUiState by phoneViewModel.uiState.collectAsState()
     val googleSignInState by googleViewModel.signInState.collectAsState()
@@ -61,7 +69,6 @@ fun PhoneVerificationScreen(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
         googleViewModel.handleSignInResult(result.data) { user ->
-            // Sign in successful, navigate to next screen
             onGoogleSignInSuccess()
         }
     }
@@ -71,7 +78,11 @@ fun PhoneVerificationScreen(
         when (phoneUiState) {
             is UiState.Success -> {
                 val formattedNumber = (phoneUiState as UiState.Success<String>).data
-                onVerificationRequested(formattedNumber)
+                val verificationId = phoneViewModel.verificationId.value ?: ""
+
+                if (verificationId.isNotEmpty()) {
+                    onVerificationRequested(formattedNumber, verificationId)
+                }
             }
             else -> { /* No action needed */ }
         }
@@ -103,7 +114,6 @@ fun PhoneVerificationScreen(
                             onPhoneNumberChange = { newValue ->
                                 phoneViewModel.updatePhoneNumber(newValue)
 
-                                // Check if we need to hide the keyboard after each digit
                                 if (phoneViewModel.isPhoneNumberComplete()) {
                                     keyboardController?.hide()
                                 }
@@ -114,8 +124,10 @@ fun PhoneVerificationScreen(
                             externalValidationTriggered = phoneViewModel.formValidator.isValidated.value,
                             onDone = {
                                 if (phoneViewModel.canVerify()) {
-                                    phoneViewModel.verifyPhoneNumber { formattedNumber ->
-                                        onVerificationRequested(formattedNumber)
+                                    phoneViewModel.sendVerificationCode(
+                                        activity = context as android.app.Activity
+                                    ) { phoneNumber, verificationId ->
+                                        onVerificationRequested(phoneNumber, verificationId)
                                     }
                                 }
                             },
@@ -144,8 +156,10 @@ fun PhoneVerificationScreen(
             Button(
                 onClick = {
                     keyboardController?.hide()
-                    phoneViewModel.verifyPhoneNumber { formattedNumber ->
-                        onVerificationRequested(formattedNumber)
+                    phoneViewModel.sendVerificationCode(
+                        activity = context as android.app.Activity
+                    ) { phoneNumber, verificationId ->
+                        onVerificationRequested(phoneNumber, verificationId)
                     }
                 },
                 enabled = canVerify,
@@ -184,7 +198,6 @@ fun PhoneVerificationScreen(
             // Google Sign-In button
             GoogleSignInButton(
                 onClick = {
-                    // Launch Google Sign-In intent directly
                     val signInIntent = googleViewModel.getSignInIntent()
                     googleSignInLauncher.launch(signInIntent)
                 },
@@ -192,6 +205,20 @@ fun PhoneVerificationScreen(
                 isLoading = googleSignInState is GoogleSignInState.Loading,
                 enabled = googleSignInState !is GoogleSignInState.Loading
             )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Email Sign-In link
+            TextButton(
+                onClick = { navController.navigate(Screen.EmailSignIn.route) },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Text(
+                    text = "Or sign in with Email",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = AccentGreen
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
         }

@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.chirilglance.androidglancedna.presentation.examples.auth.emailscreen.EmailSignInScreen
 import com.chirilglance.androidglancedna.presentation.examples.auth.otpscreen.OtpVerificationScreen
 import com.chirilglance.androidglancedna.presentation.examples.auth.phoneverificationscreen.PhoneVerificationScreen
 import com.chirilglance.androidglancedna.presentation.examples.auth.welcomescreen.WelcomeScreen
@@ -26,15 +27,20 @@ fun AuthenticationScreen(
 
     // Nested navigation host
     NavHost(
-        navController = authNavController, startDestination = Screen.PhoneVerification.route
+        navController = authNavController,
+        startDestination = Screen.PhoneVerification.route
     ) {
         composable(Screen.PhoneVerification.route) {
             PhoneVerificationScreen(
-                onVerificationRequested = { phoneNumber ->
-                    authNavController.navigate(Screen.OtpVerification.createRoute(phoneNumber))
+                navController = authNavController,
+                onVerificationRequested = { phoneNumber, verificationId ->
+                    // Navigate to OTP screen with phone number and verification ID
+                    authNavController.navigate(
+                        Screen.OtpVerification.createRoute(phoneNumber, verificationId)
+                    )
                 },
                 onGoogleSignInSuccess = {
-                    // User signed in with Google - go straight to welcome or home
+                    // User signed in with Google - go straight to welcome
                     authNavController.navigate(Screen.Welcome.route) {
                         popUpTo(Screen.PhoneVerification.route) { inclusive = true }
                     }
@@ -42,30 +48,53 @@ fun AuthenticationScreen(
             )
         }
 
-        composable(route = Screen.OtpVerification.route,
-            arguments = listOf(navArgument("phoneNumber") {
-                type = NavType.StringType
-            })
+        composable(Screen.EmailSignIn.route) {
+            EmailSignInScreen(
+                onSuccess = {
+                    // Navigate to welcome screen after successful email auth
+                    authNavController.navigate(Screen.Welcome.route) {
+                        popUpTo(Screen.PhoneVerification.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable(
+            route = Screen.OtpVerification.route,
+            arguments = listOf(
+                navArgument("phoneNumber") { type = NavType.StringType },
+                navArgument("verificationId") { type = NavType.StringType }
+            )
         ) { backStackEntry ->
             val phoneNumber = backStackEntry.arguments?.getString("phoneNumber") ?: ""
-            OtpVerificationScreen(phoneNumber = phoneNumber, onVerificationComplete = {
-                // Navigate to welcome screen
-                authNavController.navigate(Screen.Welcome.route) {
-                    popUpTo(Screen.PhoneVerification.route) { inclusive = true }
+            val verificationId = backStackEntry.arguments?.getString("verificationId") ?: ""
+
+            OtpVerificationScreen(
+                phoneNumber = phoneNumber,
+                verificationId = verificationId,
+                resendToken = null, // Token will be managed by ViewModel
+                onVerificationComplete = {
+                    // Navigate to welcome screen
+                    authNavController.navigate(Screen.Welcome.route) {
+                        popUpTo(Screen.PhoneVerification.route) { inclusive = true }
+                    }
+                },
+                onBackPressed = {
+                    authNavController.popBackStack()
                 }
-            }, onBackPressed = {
-                authNavController.popBackStack()
-            })
+            )
         }
 
         composable(Screen.Welcome.route) {
-            WelcomeScreen(onGetStarted = {
-                // navigate directly to the home screen
-                mainNavController.navigate(Screen.Home.route) {
-                    // Clear all back stack entries
-                    popUpTo(0) { inclusive = true }
+            WelcomeScreen(
+                onGetStarted = {
+                    // navigate directly to the home screen
+                    mainNavController.navigate(Screen.Home.route) {
+                        // Clear all back stack entries
+                        popUpTo(0) { inclusive = true }
+                    }
                 }
-            })
+            )
         }
     }
 }
